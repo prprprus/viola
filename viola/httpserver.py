@@ -11,24 +11,24 @@ from functools import partial
 class HttpServer(object):
 
     def __init__(self):
-        self.s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        flags = fcntl.fcntl(self.s_socket.fileno(), fcntl.F_GETFD)
+        self._s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        flags = fcntl.fcntl(self._s_socket.fileno(), fcntl.F_GETFD)
         flags |= fcntl.FD_CLOEXEC
-        fcntl.fcntl(self.s_socket.fileno(), fcntl.F_SETFD)
-        self.s_socket.setblocking(0)
-        self.s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        fcntl.fcntl(self._s_socket.fileno(), fcntl.F_SETFD)
+        self._s_socket.setblocking(0)
+        self._s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.event_loop = EventLoop.instance()
         self.connections = {}
 
     def bind(self, host="localhost", port=80):
-        self.s_socket.bind((host, port))
+        self._s_socket.bind((host, port))
 
     def listen(self, size=128):
-        self.s_socket.listen(size)
+        self._s_socket.listen(size)
         self.start()    # httpserver start here
 
     def start(self):
-        self.event_loop.add_handler(self.s_socket.fileno(), EventLoop.READ,
+        self.event_loop.add_handler(self._s_socket.fileno(), EventLoop.READ,
                                     self._handle_event)
 
     def stop(self):
@@ -36,7 +36,7 @@ class HttpServer(object):
 
     def _handle_event(self, fd, event):
         # 这里必须要 `accept()` 不然水平触发会一直通知. CPU 使用会狂飙
-        c_socket, address = self.s_socket.accept()
+        c_socket, address = self._s_socket.accept()
         c_socket.setblocking(0)
         events = EventLoop.READ
         self.event_loop.add_handler(c_socket.fileno(), events,

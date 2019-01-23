@@ -19,25 +19,23 @@ class Epoll(object):
 
     def __init__(self):
         # For `epoll_create`
-        self.epfd = _poll()
+        self._epfd = _poll()
 
     def fileno(self):
-        return self.epfd.fileno()
+        return self._epfd.fileno()
 
     def register(self, fd, events=select.EPOLLIN):
-        """For `epoll_ctl(EPOLL_CTL_ADD)`"""
-        self.epfd.register(fd, events)
-        # ET example
-        # self.epfd.register(fd, events | Epoll.ET)
+        """For `EPOLL_CTL_ADD`"""
+        self._epfd.register(fd, events)
 
     def unregister(self, fd):
-        """For `epoll_ctl(EPOLL_CTL_DEL)`"""
-        self.epfd.unregister(fd)
+        """For `EPOLL_CTL_DEL`"""
+        self._epfd.unregister(fd)
 
     def modify(self, fd, events):
-        """For `epoll_ctl(EPOLL_CTL_MOD)`"""
-        self.epfd.modify(fd, events)
+        """For `EPOLL_CTL_MOD`"""
+        self._epfd.modify(fd, events)
 
     def poll(self, timeout=-1):
         """For `epoll_wait`"""
-        return self.epfd.poll(timeout)
+        return self._epfd.poll(timeout)
