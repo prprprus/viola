@@ -3,6 +3,6 @@ import collections
 
 
 class Stream(object):
-    def __init__(self, _c_socket):
-        self._c_socket = _c_socket
-        self._read_buffer = collections.deque()
+    def __init__(self, c_socket):
+        self.c_socket = c_socket
+        self.read_buffer = collections.deque()

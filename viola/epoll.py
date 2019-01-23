@@ -3,7 +3,7 @@ import select
 
 
 try:
-    _poll = select.epoll
+    poll = select.epoll
 except ImportError:
     # logging.warning("epoll module not found")
     raise
@@ -19,23 +19,23 @@ class Epoll(object):
 
     def __init__(self):
         # For `epoll_create`
-        self._epfd = _poll()
+        self.epfd = poll()
 
     def fileno(self):
-        return self._epfd.fileno()
+        return self.epfd.fileno()
 
     def register(self, fd, events=select.EPOLLIN):
         """For `EPOLL_CTL_ADD`"""
-        self._epfd.register(fd, events)
+        self.epfd.register(fd, events)
 
     def unregister(self, fd):
         """For `EPOLL_CTL_DEL`"""
-        self._epfd.unregister(fd)
+        self.epfd.unregister(fd)
 
     def modify(self, fd, events):
         """For `EPOLL_CTL_MOD`"""
-        self._epfd.modify(fd, events)
+        self.epfd.modify(fd, events)
 
     def poll(self, timeout=-1):
         """For `epoll_wait`"""
-        return self._epfd.poll(timeout)
+        return self.epfd.poll(timeout)
