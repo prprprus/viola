@@ -11,40 +11,40 @@ from functools import partial
 class HttpServer(object):
 
     def __init__(self):
-        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        flags = fcntl.fcntl(self._socket.fileno(), fcntl.F_GETFD)
+        self.s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        flags = fcntl.fcntl(self.s_socket.fileno(), fcntl.F_GETFD)
         flags |= fcntl.FD_CLOEXEC
-        fcntl.fcntl(self._socket.fileno(), fcntl.F_SETFD)
-        self._socket.setblocking(0)
-        self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        fcntl.fcntl(self.s_socket.fileno(), fcntl.F_SETFD)
+        self.s_socket.setblocking(0)
+        self.s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.event_loop = EventLoop.instance()
         self.connections = {}
 
     def bind(self, host="localhost", port=80):
-        self._socket.bind((host, port))
+        self.s_socket.bind((host, port))
 
     def listen(self, size=128):
-        self._socket.listen(size)
+        self.s_socket.listen(size)
         self.start()    # httpserver start here
 
     def start(self):
-        self.event_loop.add_handler(self._socket.fileno(), EventLoop.READ,
-                                    self._handle_accept)
+        self.event_loop.add_handler(self.s_socket.fileno(), EventLoop.READ,
+                                    self._handle_event)
 
     def stop(self):
         pass
 
-    def _handle_accept(self, fd, event):
+    def _handle_event(self, fd, event):
         # 这里必须要 `accept()` 不然水平触发会一直通知. CPU 使用会狂飙
-        connection, address = self._socket.accept()
-        connection.setblocking(0)
+        c_socket, address = self.s_socket.accept()
+        c_socket.setblocking(0)
         events = EventLoop.READ
-        self.event_loop.add_handler(connection.fileno(), events,
+        self.event_loop.add_handler(c_socket.fileno(), events,
                                     self._handle_connection)
-        print(connection, connection.fileno())
-        # 这里如果不把 connection socket 保存起来, 函数结束后将会释放 socket
+        print(c_socket, c_socket.fileno())
+        # 这里如果不把  c_socket 保存起来, 函数结束后将会释放掉
         # 客户端再发送自然会报 104 错误
-        self.connections[connection.fileno()] = connection
+        self.connections[c_socket.fileno()] = c_socket
 
     def _handle_connection(self, fd, event):
         if event & EventLoop.READ:
