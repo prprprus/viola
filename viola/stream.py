@@ -70,12 +70,13 @@ class Stream(object):
             self.c_socket.close()
             raise
         finally:
-            # keep-alive
             try:
                 self.event_loop.remove_handler(self.c_socket.fileno())
+                # keep-alive
                 self.c_socket.close()
             except:
                 raise
+        # print(self.event_loop.handlers)
 
     def print_http_request(self):
         while len(self.read_buffer) > 0:
