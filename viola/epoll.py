@@ -15,7 +15,7 @@ class Epoll(object):
     READ = select.EPOLLIN
     WRITE = select.EPOLLOUT
     ERROR = select.EPOLLERR | select.EPOLLHUP | select.EPOLLRDHUP
-    ET = select.EPOLLET    # option
+    ET = select.EPOLLET
 
     def __init__(self):
         # For `epoll_create`
@@ -24,7 +24,7 @@ class Epoll(object):
     def fileno(self):
         return self.epfd.fileno()
 
-    def register(self, fd, events=select.EPOLLIN):
+    def register(self, fd, events):
         """For `EPOLL_CTL_ADD`"""
         self.epfd.register(fd, events)
 
