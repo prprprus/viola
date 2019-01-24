@@ -31,7 +31,7 @@ class EventLoop(object):
         if not events:
             # print("events is empty")
             raise EventsEmptyException
-        self.epoll.register(fd, events | EventLoop.ERROR | EventLoop.ET)
+        self.epoll.register(fd, events | EventLoop.ERROR)
         self.handlers[fd] = handler
         # print("[add_handler]", self.handlers)
 
@@ -46,7 +46,7 @@ class EventLoop(object):
         if not events:
             # print("events is empty")
             raise EventsEmptyException
-        self.epoll.modify(fd, events | EventLoop.ERROR | EventLoop.ET)
+        self.epoll.modify(fd, events | EventLoop.ERROR)
         # print("[update_handler]", self.handlers)
 
     def start(self):

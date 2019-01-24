@@ -69,6 +69,3 @@ class HttpResponse(object):
         # 写到 stream 的 write_buffer
         # 将 stream.c_socket 的监听事件修改成 EventLoop.WRITE
         self.stream.write_buffer.append(resp_data)
-        events = EventLoop.WRITE
-        # events = EventLoop.READ | EventLoop.WRITE
-        self.event_loop.update_handler(self.stream.c_socket.fileno(), events)

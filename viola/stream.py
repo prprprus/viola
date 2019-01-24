@@ -4,13 +4,6 @@ from viola.event_loop import EventLoop
 from viola.http_handler import HttpHandler
 
 
-resp_data = b"""
-HTTP/1.1 200 OK
-
-{"result": "ok"}
-"""
-
-
 class Stream(object):
     def __init__(self, c_socket, event_loop, router, max_buffer_size=104857600,
                  chunk_size=4096):
@@ -31,6 +24,8 @@ class Stream(object):
         try:
             if event & EventLoop.READ:
                 self.handle_read()
+                events = EventLoop.WRITE
+                self.event_loop.update_handler(self.c_socket.fileno(), events)
                 # 将读写处理完毕的 stream 丢给 `http_handler` 做 HTTP 解析
                 HttpHandler(self, self.event_loop, self.router)
             elif event & EventLoop.WRITE:
