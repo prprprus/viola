@@ -24,6 +24,7 @@ class Stream(object):
         try:
             if event & EventLoop.READ:
                 self.handle_read()
+                # Setting write interested
                 events = EventLoop.WRITE
                 self.event_loop.update_handler(self.c_socket.fileno(), events)
                 # 将读写处理完毕的 stream 丢给 `http_handler` 做 HTTP 解析

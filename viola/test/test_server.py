@@ -32,6 +32,6 @@ router["/xxx"] = post
 if __name__ == '__main__':
     server = HttpServer(router)    # 这个 router 的传递路线值得慢慢体会, 理解面向对象之间的通信方式
     server.bind(host="10.211.55.25", port=2333)
-    server.listen()
+    server.listen(9128)
     event_loop = EventLoop.instance()
     event_loop.start()
