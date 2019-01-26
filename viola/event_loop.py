@@ -26,10 +26,11 @@ class EventLoop(object):
         return cls._instance
 
     def add_handler(self, fd, events, handler):
-        """Register listen fd to epoll and add handler"""
-        # Addition of EventLoop.ERROR for events
+        """
+        Register listen fd to epoll and add handler
+        Addition of EventLoop.ERROR for events
+        """
         if not events:
-            # print("events is empty")
             raise EventsEmptyException
         self.epoll.register(fd, events | EventLoop.ERROR)
         self.handlers[fd] = handler
@@ -44,7 +45,6 @@ class EventLoop(object):
     def update_handler(self, fd, events):
         """Update interested event of fd"""
         if not events:
-            # print("events is empty")
             raise EventsEmptyException
         self.epoll.modify(fd, events | EventLoop.ERROR)
         # print("[update_handler]", self.handlers)
@@ -53,7 +53,7 @@ class EventLoop(object):
         while True:
             events = self.epoll.poll(self.timeout)
             for fd, event in events:
-                # Run httpserver's `_handler_event` callback method
+                # Run httpserver's `_handler_event`
                 self.handlers[fd](fd, event)
 
     def stop(self):

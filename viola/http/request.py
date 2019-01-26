@@ -1,6 +1,10 @@
 # encoding=utf8
+"""
+- 接收 handler 模块的输入: read_buffer
+- 按照 HTTP 协议解析 read_buffer
+- 将解析结果封装成 `HttpRequest` 对象并返回
+"""
 import io
-from viola.event_loop import EventLoop
 
 
 class HTTPMethodException(Exception):
@@ -11,8 +15,7 @@ class HTTPVersionException(Exception):
     pass
 
 
-class HttpHandler(object):
-
+class Parser(object):
     HTTP_METHOD = [
         "OPTIONS",
         "GET",
@@ -23,24 +26,24 @@ class HttpHandler(object):
         "TRACE",
         "CONNECT"
     ]
-    HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
+    HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]    # 做好 1.1 再说 2.0 吧
 
-    def __init__(self, stream, event_loop, router):
-        self.stream = stream
-        self.event_loop = event_loop
-        self.router = router
+    def __init__(self, request_buffer):
+        self.request_buffer = request_buffer
         self.headers = {}
         self.env = {}
-        self.parse_request()
-        self.execute()
 
     def parse_request(self):
         self._parse_headers()
         self._parse_body()
         self._parse_mime_body()
+        return {
+            "headers": self.headers,
+            "env": self.env
+        }
 
     def _parse_headers(self):
-        req_cont = io.StringIO(self.stream.read_buffer.popleft().decode("utf8"))
+        req_cont = io.StringIO(self.request_buffer.popleft().decode("utf8"))
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')
             if line:
@@ -57,7 +60,7 @@ class HttpHandler(object):
 
     def _parse_method(self, method):
         """解析请求方法"""
-        if method not in HttpHandler.HTTP_METHOD:
+        if method not in Parser.HTTP_METHOD:
             raise HTTPMethodException
         self.headers["method"] = method
 
@@ -73,7 +76,7 @@ class HttpHandler(object):
 
     def _parse_version(self, version):
         """解析 HTTP 版本"""
-        if version not in HttpHandler.HTTP_VERSION:
+        if version not in Parser.HTTP_VERSION:
             raise HTTPVersionException
         self.headers["version"] = version
 
@@ -83,32 +86,11 @@ class HttpHandler(object):
     def _parse_mime_body(self):
         pass
 
-    def execute(self):
-        """路由"""
-        request = HttpRequest(self.headers, self.env)
-        response = HttpResponse(self.stream, self.event_loop)
-        self.router[request.headers["url"]](request, response)
-
 
 class HttpRequest(object):
-    def __init__(self, headers, env):
-        self.headers = headers
-        self.env = env
-
-
-class HttpResponse(object):
-    def __init__(self, stream, event_loop):
-        self.stream = stream
-        self.event_loop = event_loop
-
-    def write(self, resp_data):
-        # 封装 data => HTTP 响应体格式
-        # 写到 stream 的 write_buffer
-        # 将 stream.c_socket 的监听事件修改成 EventLoop.WRITE
-        self.wrapper_response(resp_data)
-        self.stream.write_buffer.append(resp_data)
-        events = EventLoop.WRITE
-        self.event_loop.update_handler(self.stream.c_socket.fileno(), events)
-
-    def wrapper_response(sefl, resp_data):
-        pass
+    def __init__(self, read_buffer):
+        self.read_buffer = read_buffer
+        self.parser = Parser(self.read_buffer)
+        result = self.parser.parse_request()
+        self.headers = result["headers"]
+        self.env = result["env"]

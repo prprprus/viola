@@ -13,3 +13,12 @@ Hi guys, viola is a epoll-based event loop http server.
 # 手尾
 - ET 和 LT 对变成难度的影响
 - `print()` 对程序性能的影响非常大
+
+# 参考
+- HTTP request: https://tools.ietf.org/html/rfc2616#section-5
+- HTTP response: https://tools.ietf.org/html/rfc2616#section-6
+
+# 目标
+- 事件驱动的并发模型. 压测通过
+- 解析 HTTP GET 请求
+- keep-Alive

@@ -1,18 +1,18 @@
 # encoding=utf8
 import collections
 from viola.event_loop import EventLoop
-from viola.http_handler import HttpHandler
+from viola.http.handler import HttpHandler
 
 
 class Stream(object):
-    def __init__(self, c_socket, event_loop, router, max_buffer_size=104857600,
-                 chunk_size=4096):
+    def __init__(self, c_socket, event_loop, url_views,
+                 max_buffer_size=104857600, chunk_size=4096):
         self.c_socket = c_socket
         self.c_socket.setblocking(0)
         self.event_loop = event_loop
-        self.router = router
-        self.read_buffer = collections.deque()    # HTTP request
-        self.write_buffer = collections.deque()    # HTTP response
+        self.url_views = url_views
+        self.read_buffer = collections.deque()    # HTTP request read buffer
+        self.write_buffer = collections.deque()    # HTTP response write buffer
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
         # events 暂时这样处理
@@ -24,8 +24,8 @@ class Stream(object):
         try:
             if event & EventLoop.READ:
                 self.handle_read()
-                # 将读写处理完毕的 stream 丢给 `http_handler` 做 HTTP 解析
-                HttpHandler(self, self.event_loop, self.router)
+                # 将读写处理完毕的 stream 丢给 `http_handler`
+                HttpHandler(self, self.event_loop, self.url_views).route()
             elif event & EventLoop.WRITE:
                 self.handle_write()
             elif event & EventLoop.ERROR:

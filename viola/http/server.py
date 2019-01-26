@@ -11,7 +11,7 @@ class RouterEmptyException(Exception):
 
 class HttpServer(object):
 
-    def __init__(self, router):
+    def __init__(self, url_views):
         self.s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         flags = fcntl.fcntl(self.s_socket.fileno(), fcntl.F_GETFD)
         flags |= fcntl.FD_CLOEXEC
@@ -19,9 +19,9 @@ class HttpServer(object):
         self.s_socket.setblocking(0)
         self.s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.event_loop = EventLoop.instance()
-        if not router:
+        if not url_views:
             raise RouterEmptyException
-        self.router = router
+        self.url_views = url_views
 
     def bind(self, host="localhost", port=80):
         self.s_socket.bind((host, port))
@@ -38,11 +38,10 @@ class HttpServer(object):
         pass
 
     def handle_event(self, fd, event):
-        # 这里必须要 `accept()` 不然水平触发会一直通知. CPU 使用会狂飙
         try:
             c_socket, address = self.s_socket.accept()
         except:
             print("accept error, close it")
             c_socket.close()
             raise
-        Stream(c_socket, self.event_loop, self.router)
+        Stream(c_socket, self.event_loop, self.url_views)
