@@ -2,6 +2,7 @@
 import collections
 from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
+import socket
 
 
 class Stream(object):
@@ -19,6 +20,8 @@ class Stream(object):
         events = EventLoop.READ
         self.event_loop.add_handler(self.c_socket.fileno(), events,
                                     self.handle_event)
+        self.c_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 5)
+        print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE))
 
     def handle_event(self, fd, event):
         try:
@@ -69,6 +72,7 @@ class Stream(object):
             raise
         finally:
             try:
+                print("Finally close cpnnection...")
                 self.event_loop.remove_handler(self.c_socket.fileno())
                 # keep-alive
                 self.c_socket.close()
