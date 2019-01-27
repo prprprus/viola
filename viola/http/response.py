@@ -18,3 +18,7 @@ class HttpResponse(object):
 
     def wrapper_response(sefl, resp_data):
         pass
+
+
+class HttpStatusResponse(object):
+    pass

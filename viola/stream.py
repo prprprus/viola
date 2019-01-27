@@ -2,16 +2,17 @@
 import collections
 from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
-import socket
+from viola.http.keepalive import KeepAlive
 
 
 class Stream(object):
-    def __init__(self, c_socket, event_loop, url_views,
+    def __init__(self, c_socket, event_loop, url_views, keepalive,
                  max_buffer_size=104857600, chunk_size=4096):
         self.c_socket = c_socket
         self.c_socket.setblocking(0)
         self.event_loop = event_loop
         self.url_views = url_views
+        self.keepalive = keepalive
         self.read_buffer = collections.deque()    # HTTP request read buffer
         self.write_buffer = collections.deque()    # HTTP response write buffer
         self.chunk_size = chunk_size
@@ -20,8 +21,6 @@ class Stream(object):
         events = EventLoop.READ
         self.event_loop.add_handler(self.c_socket.fileno(), events,
                                     self.handle_event)
-        self.c_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 5)
-        print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE))
 
     def handle_event(self, fd, event):
         try:
@@ -58,7 +57,6 @@ class Stream(object):
                 break
 
     def handle_write(self):
-        # sendall(self.write_buffer)
         try:
             while self.write_buffer:
                 # resp_data = self.write_buffer.popleft()
@@ -72,10 +70,15 @@ class Stream(object):
             raise
         finally:
             try:
-                print("Finally close cpnnection...")
-                self.event_loop.remove_handler(self.c_socket.fileno())
-                # keep-alive
-                self.c_socket.close()
+                if self.keepalive:
+                    # 设置成读监听. 结合 Keep-Alive 重复利用 TCP 连接
+                    events = EventLoop.READ
+                    self.event_loop.update_handler(self.c_socket.fileno(), events)
+                    if KeepAlive.not_exists(self.c_socket):
+                        KeepAlive(self.c_socket, self.event_loop)
+                else:
+                    self.event_loop.remove_handler(self.c_socket.fileno())
+                    self.c_socket.close()
             except:
                 raise
         # print(self.event_loop.handlers)
