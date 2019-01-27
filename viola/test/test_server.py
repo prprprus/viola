@@ -15,9 +15,9 @@ url_views = {}
 
 
 def get(request, response):
-    # print("[headers]", request.headers)
-    # for k, v in request.headers.items():
-    #     print(k + ':', v)
+    print("[headers]", request.headers)
+    for k, v in request.headers.items():
+        print(k + ':', v)
     response.write(resp_data)
 
 
