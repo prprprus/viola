@@ -51,14 +51,13 @@ class EventLoop(object):
         # print("[update_handler]", self.handlers)
 
     def start(self):
-        poll_timeout = 0.2
         while True:
-            if self.scheduler.tasks:
-                now = time.time()
-                while self.scheduler.tasks and \
-                        (self.scheduler.tasks[0].deadline <= now):
-                    self.scheduler.tasks[0].callback()
-                    self.scheduler.tasks.popleft()
+            poll_timeout = 0.2
+            now = time.time()
+            while self.scheduler.tasks and \
+                    (self.scheduler.tasks[0].deadline <= now):
+                self.scheduler.tasks[0].callback()
+                self.scheduler.tasks.popleft()
 
             # Priority run task if interval less than `timeout`
             if self.scheduler.tasks:
