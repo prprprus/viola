@@ -1,5 +1,6 @@
 # encoding=utf8
 """
+# web-framework 部分
 - 将 stream 读到的数据解析并封装成 `HttpRequest` 对象
 - 将 web-framework 的返回数据封装成 `HttpResponse` 并交给 stream 写
 """

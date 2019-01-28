@@ -30,7 +30,7 @@ class Task(object):
     __slots__ = ["deadline", "callback"]
 
     def __init__(self, deadline, callback):
-        self.deadline = time.time() + deadline   # Unit for second
+        self.deadline = time.time() + deadline   # Unit for seconds
         self.callback = callback
 
     def __eq__(self, other):

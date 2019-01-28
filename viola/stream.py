@@ -2,6 +2,7 @@
 import collections
 from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
+from viola.http.keepalive import KeepAlive
 
 
 class EventNotExistsException(Exception):
@@ -28,12 +29,11 @@ class Stream(object):
         if event & EventLoop.READ:
             self.handle_read()
             # 将读写处理完毕的 stream 丢给 `http_handler`
+            # 异常处理?
             if self.read_buffer:
                 HttpHandler(self, self.event_loop, self.url_views)
         elif event & EventLoop.WRITE:
-            # 异常处理?
-            if self.write_buffer:
-                self.handle_write()
+            self.handle_write()
         elif event & EventLoop.ERROR:
             print("epoll error, close it")
             self.handle_error()
@@ -47,6 +47,9 @@ class Stream(object):
         while True:
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
+                # print("++++++++++")
+                # print(chunk)
+                # print("++++++++++")
             except BlockingIOError:
                 # print("BlockingIOError ignore it")
                 break
@@ -62,6 +65,9 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
+                # print("----------")
+                # print(self.write_buffer[0])
+                # print("----------")
                 self.c_socket.send(self.write_buffer[0])
                 self.write_buffer.popleft()
         except:
@@ -69,7 +75,14 @@ class Stream(object):
             print('fuxk')
             raise
         finally:
-            self.handle_error()
+            # keepalive
+            if self.keepalive:
+                events = EventLoop.READ
+                self.event_loop.update_handler(self.c_socket.fileno(), events)
+                if KeepAlive.not_exists(self.c_socket):
+                    KeepAlive(self.c_socket, self.event_loop)
+            else:
+                self.handle_error()
 
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
