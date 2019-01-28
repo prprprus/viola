@@ -4,7 +4,8 @@ import time
 
 address = ("10.211.55.25", 2333)
 msg = """
-GET /listNews http/1.1
+GET /listNews HTTP/1.1
+Connection: Keep-Alive
 Host: 127.0.0.1:8080
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36
 Accept: application/json
@@ -25,6 +26,9 @@ def main():
     # once
     # cs.sendall(b"hello")
     # print(cs.recv(8192))
+    cs.sendall(msg.encode("utf8"))
+    print(cs.recv(8192))
+
     cs.sendall(msg.encode("utf8"))
     print(cs.recv(8192))
 

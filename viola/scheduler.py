@@ -1,6 +1,7 @@
 # encoding=utf8
 import bisect
 import time
+from collections import deque
 
 
 class Scheduler(object):
@@ -12,18 +13,18 @@ class Scheduler(object):
         return cls._instance
 
     def __init__(self):
-        self.tasks = []    # Orderly list
+        self.tasks = deque()    # Orderly queue
         self.running = False
 
     def add_task(self, deadline, callback):
-        task = Task(deadline, self._run(callback))
+        task = Task(deadline, self._wrap_callback(callback))
         bisect.insort(self.tasks, task)
         self.running = True
 
     def cancel(self):
         self.running = False
 
-    def _run(self, callback):
+    def _wrap_callback(self, callback):
         if not self.running:
             # print("Task was canceled")
             return
@@ -39,7 +40,7 @@ class Task(object):
     __slots__ = ["deadline", "callback"]
 
     def __init__(self, deadline, callback):
-        self.deadline = time.time() + deadline / 1000   # millisecond
+        self.deadline = time.time() + deadline   # millisecond
         self.callback = callback
 
     def __eq__(self, other):
