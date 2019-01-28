@@ -1,7 +1,6 @@
 # encoding=utf8
 import socket
 import weakref
-from threading import Timer
 from viola.scheduler import Scheduler
 
 
@@ -29,8 +28,7 @@ class KeepAlive(object):
             self.conn.setsockopt(socket.SOL_SOCKET,
                                  socket.SO_KEEPALIVE,
                                  KeepAlive.TCP_KEEPALIVE)
-        # Timer(self.timeout, self.close_conn).start()    # Replace to `scheduler`
-        # Scheduler.instance().add_task(5, self.close_conn)
+        Scheduler.instance().add_task(5, self.close_conn)
 
     def close_conn(self):
         self.event_loop.remove_handler(self.conn.fileno())

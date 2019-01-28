@@ -29,8 +29,8 @@ def main():
     cs.sendall(msg.encode("utf8"))
     print(cs.recv(8192))
 
-    cs.sendall(msg.encode("utf8"))
-    print(cs.recv(8192))
+    # cs.sendall(msg.encode("utf8"))
+    # print(cs.recv(8192))
 
 
 if __name__ == '__main__':

@@ -2,7 +2,6 @@
 import collections
 from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
-from viola.http.keepalive import KeepAlive
 
 
 class Stream(object):
@@ -25,13 +24,11 @@ class Stream(object):
     def handle_event(self, fd, event):
         try:
             if event & EventLoop.READ:
-                print(1)
                 self.handle_read()
                 # 将读写处理完毕的 stream 丢给 `http_handler`
                 if self.read_buffer:
                     HttpHandler(self, self.event_loop, self.url_views).route()
             elif event & EventLoop.WRITE:
-                print(2)
                 self.handle_write()
             elif event & EventLoop.ERROR:
                 print("epoll error, close it")
@@ -48,7 +45,7 @@ class Stream(object):
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
             except BlockingIOError:
-                print("BlockingIOError ignore it")
+                # print("BlockingIOError ignore it")
                 break
             except:
                 print("c_socket recv error, close it")
@@ -56,9 +53,6 @@ class Stream(object):
                 raise
             if len(chunk) > 0:
                 self.read_buffer.append(chunk)
-                print('-------------')
-                print(chunk)
-                print('-------------')
             else:
                 break
 
@@ -75,18 +69,8 @@ class Stream(object):
             self.c_socket.close()
             raise
         finally:
-            try:
-                if self.keepalive:
-                    # 设置成读监听. 结合 Keep-Alive 重复利用 TCP 连接
-                    # events = EventLoop.READ
-                    # self.event_loop.update_handler(self.c_socket.fileno(), events)
-                    if KeepAlive.not_exists(self.c_socket):
-                        KeepAlive(self.c_socket, self.event_loop)
-                else:
-                    self.event_loop.remove_handler(self.c_socket.fileno())
-                    self.c_socket.close()
-            except:
-                raise
+            self.event_loop.remove_handler(self.c_socket.fileno())
+            self.c_socket.close()
         # print(self.event_loop.handlers)
 
     def handle_error(self):
