@@ -48,7 +48,7 @@ class Stream(object):
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
             except BlockingIOError:
-                # print("BlockingIOError ignore it")
+                print("BlockingIOError ignore it")
                 break
             except:
                 print("c_socket recv error, close it")
@@ -56,6 +56,9 @@ class Stream(object):
                 raise
             if len(chunk) > 0:
                 self.read_buffer.append(chunk)
+                print('-------------')
+                print(chunk)
+                print('-------------')
             else:
                 break
 
