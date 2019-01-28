@@ -83,11 +83,9 @@ class Stream(object):
                 raise
         # print(self.event_loop.handlers)
 
-    def print_http_request(self):
-        while len(self.read_buffer) > 0:
-            print("[receive data]",
-                  self.read_buffer.popleft().decode("utf8"))
-        print("[read_buffer]", self.read_buffer)
+    def handle_error(self):
+        self.event_loop.remove_handler(self.c_socket.fileno())
+        self.c_socket.close()
 
 # def _handle_connection(self, fd, event):
 #         if event & EventLoop.READ:
