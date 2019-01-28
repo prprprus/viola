@@ -24,7 +24,6 @@ class EventLoop(object):
     def __init__(self, scheduler):
         self.epoll = Epoll()
         self.handlers = {}
-        self.timeout = 0.2
         self.scheduler = scheduler
 
     def add_handler(self, fd, events, handler):
@@ -52,6 +51,7 @@ class EventLoop(object):
         # print("[update_handler]", self.handlers)
 
     def start(self):
+        poll_timeout = 0.2
         while True:
             if self.scheduler.tasks:
                 now = time.time()
@@ -61,15 +61,13 @@ class EventLoop(object):
                     self.scheduler.tasks.popleft()
 
             # Priority run task if interval less than `timeout`
-            # if self.scheduler.tasks:
-            #     interval = self.scheduler.tasks[0].deadline - now
-            #     poll_timeout = min(interval, self.timeout)
-            # else:
-            #     poll_timeout = self.timeout
+            if self.scheduler.tasks:
+                interval = self.scheduler.tasks[0].deadline - now
+                poll_timeout = min(interval, poll_timeout)
 
-            events = self.epoll.poll(self.timeout)
+            events = self.epoll.poll(poll_timeout)
             for fd, event in events:
-                # Run httpserver's `_handler_event`
+                # Run `_handler_event` of httpserver module
                 self.handlers[fd](fd, event)
 
     def stop(self):

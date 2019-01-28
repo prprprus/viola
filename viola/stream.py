@@ -71,12 +71,12 @@ class Stream(object):
             print('fuxk')
             raise
         finally:
-            try:
-                self.event_loop.scheduler.add_task(3, self.test_task)
-            except:
-                raise
-            finally:
-                self.handle_error()
+            # try:
+            #     self.event_loop.scheduler.add_task(3, self.test_task)
+            # except:
+            #     raise
+            # finally:
+            self.handle_error()
         # print(self.event_loop.handlers)
 
     def handle_error(self):
