@@ -21,4 +21,5 @@ class HttpResponse(object):
 
 
 class HttpStatusResponse(object):
+    """404, 405..."""
     pass

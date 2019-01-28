@@ -20,7 +20,6 @@ class Stream(object):
         self.write_buffer = collections.deque()    # HTTP response write buffer
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
-        # events 暂时这样处理
         events = EventLoop.READ
         self.event_loop.add_handler(self.c_socket.fileno(), events,
                                     self.handle_event)
@@ -32,6 +31,7 @@ class Stream(object):
             if self.read_buffer:
                 HttpHandler(self, self.event_loop, self.url_views)
         elif event & EventLoop.WRITE:
+            # 异常处理?
             if self.write_buffer:
                 self.handle_write()
         elif event & EventLoop.ERROR:

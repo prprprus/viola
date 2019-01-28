@@ -1,5 +1,4 @@
 import select
-# import logging
 
 
 try:
@@ -10,32 +9,26 @@ except ImportError:
 
 
 class Epoll(object):
-    """Wapper epoll"""
-    # Constant of epoll
+    # Constant of epoll module
     READ = select.EPOLLIN
     WRITE = select.EPOLLOUT
     ERROR = select.EPOLLERR | select.EPOLLHUP | select.EPOLLRDHUP
     ET = select.EPOLLET
 
     def __init__(self):
-        # For `epoll_create`
-        self.epfd = poll()
+        self.epfd = poll()  # epoll_create
 
     def fileno(self):
         return self.epfd.fileno()
 
     def register(self, fd, events):
-        """For `EPOLL_CTL_ADD`"""
-        self.epfd.register(fd, events)
+        self.epfd.register(fd, events)  # EPOLL_CTL_ADD
 
     def unregister(self, fd):
-        """For `EPOLL_CTL_DEL`"""
-        self.epfd.unregister(fd)
+        self.epfd.unregister(fd)    # EPOLL_CTL_DEL
 
     def modify(self, fd, events):
-        """For `EPOLL_CTL_MOD`"""
-        self.epfd.modify(fd, events)
+        self.epfd.modify(fd, events)    # EPOLL_CTL_MOD
 
     def poll(self, timeout=-1):
-        """For `epoll_wait`"""
-        return self.epfd.poll(timeout)
+        return self.epfd.poll(timeout)  # epoll_wait

@@ -16,7 +16,6 @@ class HttpHandler(object):
         self.route()
 
     def route(self):
-        """路由"""
         request = HttpRequest(self.stream.read_buffer)
         response = HttpResponse(self.stream, self.event_loop)
         self.url_views[request.headers["url"]](request, response)

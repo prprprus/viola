@@ -16,17 +16,9 @@ class HTTPVersionException(Exception):
 
 
 class Parser(object):
-    HTTP_METHOD = [
-        "OPTIONS",
-        "GET",
-        "HEAD",
-        "POST",
-        "PUT",
-        "DELETE",
-        "TRACE",
-        "CONNECT"
-    ]
-    HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]    # 做好 1.1 再说 2.0 吧
+    HTTP_METHOD = ["OPTIONS", "GET", "HEAD", "POST",
+                   "PUT", "DELETE", "TRACE", "CONNECT"]
+    HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
 
     def __init__(self, request_buffer):
         self.request_buffer = request_buffer
@@ -34,6 +26,7 @@ class Parser(object):
         self.env = {}
 
     def parse_request(self):
+        """解析 HTTP 请求"""
         self._parse_headers()
         self._parse_body()
         self._parse_mime_body()
@@ -43,6 +36,7 @@ class Parser(object):
         }
 
     def _parse_headers(self):
+        """解析 HTTP header 信息"""
         req_cont = io.StringIO(self.request_buffer.popleft().decode("utf8"))
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')

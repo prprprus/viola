@@ -1,3 +1,4 @@
+"""A epoll-based event loop. Use edge trigger mode of epoll"""
 from viola.epoll import Epoll
 import time
 
@@ -7,8 +8,6 @@ class EventsEmptyException(Exception):
 
 
 class EventLoop(object):
-    """A epoll-based event loop. Use edge trigger mode of epoll"""
-    # Constant of EventLoop
     READ = Epoll.READ
     WRITE = Epoll.WRITE
     ERROR = Epoll.ERROR
@@ -16,7 +15,6 @@ class EventLoop(object):
 
     @classmethod
     def instance(cls, scheduler):
-        """Singleton mode"""
         if not hasattr(cls, "_instance"):
             cls._instance = cls(scheduler)
         return cls._instance
@@ -35,20 +33,17 @@ class EventLoop(object):
             raise EventsEmptyException
         self.epoll.register(fd, events | EventLoop.ERROR)
         self.handlers[fd] = handler
-        # print("[add_handler]", self.handlers)
 
     def remove_handler(self, fd):
         """Unregister listen fd from epoll and remove handler"""
         self.epoll.unregister(fd)
         self.handlers.pop(fd)
-        # print("[remove_handler]", self.handlers)
 
     def update_handler(self, fd, events):
         """Update interested event of fd"""
         if not events:
             raise EventsEmptyException
         self.epoll.modify(fd, events | EventLoop.ERROR)
-        # print("[update_handler]", self.handlers)
 
     def start(self):
         while True:
@@ -56,8 +51,7 @@ class EventLoop(object):
             now = time.time()
             while self.scheduler.tasks and \
                     (self.scheduler.tasks[0].deadline <= now):
-                # Add try-catch
-                self.scheduler.tasks[0].callback()
+                self.scheduler.tasks[0].callback()  # Add try-catch
                 self.scheduler.tasks.popleft()
 
             # Priority run task if interval less than `timeout`
@@ -67,8 +61,7 @@ class EventLoop(object):
 
             events = self.epoll.poll(poll_timeout)
             for fd, event in events:
-                # Run `_handler_event` of httpserver module
-                self.handlers[fd](fd, event)
+                self.handlers[fd](fd, event)    # Event already and run callback
 
     def stop(self):
         pass
