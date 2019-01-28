@@ -2,7 +2,6 @@
 import bisect
 import time
 from collections import deque
-from functools import partial
 
 
 class Scheduler(object):
@@ -18,8 +17,6 @@ class Scheduler(object):
         self.running = False
 
     def add_task(self, deadline, callback):
-        # task = Task(deadline, self._wrap_callback(callback))
-        # partial(self._wrap_callback, callback)
         task = Task(deadline, callback)
         bisect.insort(self.tasks, task)
         self.running = True
@@ -27,23 +24,13 @@ class Scheduler(object):
     def cancel(self):
         self.running = False
 
-    def _wrap_callback(self, callback):
-        if not self.running:
-            # print("Task was canceled")
-            return
-        try:
-            callback()
-        except:
-            # print("Callback error")
-            raise
-
 
 class Task(object):
 
     __slots__ = ["deadline", "callback"]
 
     def __init__(self, deadline, callback):
-        self.deadline = time.time() + deadline   # millisecond
+        self.deadline = time.time() + deadline   # Unit for second
         self.callback = callback
 
     def __eq__(self, other):

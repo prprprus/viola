@@ -62,8 +62,6 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
-                # resp_data = self.write_buffer.popleft()
-                # self.c_socket.sendall(resp_data.encode("utf8"))
                 self.c_socket.send(self.write_buffer[0])
                 self.write_buffer.popleft()
         except:
@@ -71,46 +69,19 @@ class Stream(object):
             print('fuxk')
             raise
         finally:
-            try:
-                self.event_loop.scheduler.add_task(3, self.test_task)
-            except:
-                raise
-            finally:
-                self.handle_error()
-        # print(self.event_loop.handlers)
+            self.handle_error()
 
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
 
+    def test_scheduler(self):
+        try:
+            self.event_loop.scheduler.add_task(3, self.test_task)
+        except:
+            raise
+        finally:
+            self.handle_error()
+
     def test_task(self):
         print("hello")
-
-# def _handle_connection(self, fd, event):
-#         if event & EventLoop.READ:
-#             chuck = self.connections[fd].recv(8192)
-#             # 判断是否读取结束(直到读到 0 个字节为止)
-#             while len(chuck) > 0:
-#                 try:
-#                     chuck += self.connections[fd].recv(8192)
-#                 except BlockingIOError:
-#                     break
-#             # 输出最终的读取结果
-#             print(chuck)
-
-#             # 关闭连接. 否则读就绪事件会一直通知
-#             # self.connections[fd].close()
-#             # print("read finished, close socket.")
-#             # return
-#             # 尝试不关闭 socket 而是将事件改成写感兴趣
-#             events = EventLoop.WRITE
-#             self.event_loop.update_handler(fd, events)
-#             return
-#         elif event & EventLoop.WRITE:
-#             print(fd, event)
-#             print("fuxk")
-#             self.connections[fd].sendall(b"111")    # b"111" 换成动态的消息
-#             self.connections[fd].shutdown(socket.SHUT_RDWR)    # ?
-#             self.connections[fd].close()    # keep-alive 就是这里不关闭. 而是将写感兴趣又改成读感兴趣
-#         elif event & EventLoop.ERROR:
-#             print("fuxk error")

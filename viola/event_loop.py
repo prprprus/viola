@@ -56,6 +56,7 @@ class EventLoop(object):
             now = time.time()
             while self.scheduler.tasks and \
                     (self.scheduler.tasks[0].deadline <= now):
+                # Add try-catch
                 self.scheduler.tasks[0].callback()
                 self.scheduler.tasks.popleft()
 
