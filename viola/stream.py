@@ -47,9 +47,6 @@ class Stream(object):
         while True:
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
-                # print("++++++++++")
-                # print(chunk)
-                # print("++++++++++")
             except BlockingIOError:
                 # print("BlockingIOError ignore it")
                 break
@@ -65,9 +62,6 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
-                # print("----------")
-                # print(self.write_buffer[0])
-                # print("----------")
                 self.c_socket.send(self.write_buffer[0])
                 self.write_buffer.popleft()
         except:
@@ -87,14 +81,3 @@ class Stream(object):
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
-
-    def test_scheduler(self):
-        try:
-            self.event_loop.scheduler.add_task(3, self.test_task)
-        except:
-            raise
-        finally:
-            self.handle_error()
-
-    def test_task(self):
-        print("hello")
