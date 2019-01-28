@@ -28,7 +28,7 @@ class KeepAlive(object):
             self.conn.setsockopt(socket.SOL_SOCKET,
                                  socket.SO_KEEPALIVE,
                                  KeepAlive.TCP_KEEPALIVE)
-        Timer(self.timeout, self.close_conn).start()
+        Timer(self.timeout, self.close_conn).start()    # Replace to `scheduler`
 
     def close_conn(self):
         self.event_loop.remove_handler(self.conn.fileno())
