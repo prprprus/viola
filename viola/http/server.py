@@ -46,11 +46,9 @@ class HttpServer(object):
                     return
                 else:
                     os.waitpid(-1, 0)
-                    # self.event_loop.start()
         else:
             self.event_loop.add_handler(self.s_socket.fileno(), EventLoop.READ,
                                         self.handle_event)
-            # self.event_loop.start()
 
     def stop(self):
         pass

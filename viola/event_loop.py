@@ -1,4 +1,5 @@
 from viola.epoll import Epoll
+import time
 
 
 class EventsEmptyException(Exception):
@@ -51,11 +52,27 @@ class EventLoop(object):
         # print("[update_handler]", self.handlers)
 
     def start(self):
-        print("-------------")
-        print(self.scheduler.tasks)
-        print(self.scheduler.running)
-        print("-------------")
         while True:
+            # if self.scheduler.tasks:
+            #     now = time.time()
+            #     while self.scheduler.tasks and \
+            #             (self.scheduler.tasks[0].deadline <= now):
+            #         print("-------------")
+            #         print(self.scheduler.tasks)
+            #         print(self.scheduler.running)
+            #         print(self.scheduler.tasks[0].deadline)
+            #         print(now)
+            #         print("-------------")
+            #         self.scheduler.tasks[0].callback()
+            #         self.scheduler.tasks.popleft()
+
+            # Priority run task if interval less than `timeout`
+            # if self.scheduler.tasks:
+            #     interval = self.scheduler.tasks[0].deadline - now
+            #     poll_timeout = min(interval, self.timeout)
+            # else:
+            #     poll_timeout = self.timeout
+
             events = self.epoll.poll(self.timeout)
             for fd, event in events:
                 # Run httpserver's `_handler_event`

@@ -25,10 +25,13 @@ class Stream(object):
     def handle_event(self, fd, event):
         try:
             if event & EventLoop.READ:
+                print(1)
                 self.handle_read()
                 # 将读写处理完毕的 stream 丢给 `http_handler`
-                HttpHandler(self, self.event_loop, self.url_views).route()
+                if self.read_buffer:
+                    HttpHandler(self, self.event_loop, self.url_views).route()
             elif event & EventLoop.WRITE:
+                print(2)
                 self.handle_write()
             elif event & EventLoop.ERROR:
                 print("epoll error, close it")
@@ -64,7 +67,7 @@ class Stream(object):
                 self.c_socket.send(self.write_buffer[0])
                 self.write_buffer.popleft()
         except:
-            print("c_socket sendall error, close it")
+            print("c_socket send error, close it")
             print('fuxk')
             self.c_socket.close()
             raise
@@ -72,8 +75,8 @@ class Stream(object):
             try:
                 if self.keepalive:
                     # 设置成读监听. 结合 Keep-Alive 重复利用 TCP 连接
-                    events = EventLoop.READ
-                    self.event_loop.update_handler(self.c_socket.fileno(), events)
+                    # events = EventLoop.READ
+                    # self.event_loop.update_handler(self.c_socket.fileno(), events)
                     if KeepAlive.not_exists(self.c_socket):
                         KeepAlive(self.c_socket, self.event_loop)
                 else:
@@ -86,6 +89,15 @@ class Stream(object):
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
+
+    def response_keepalive(self):
+        msg = b"""
+HTTP/1.1 200 OK
+Connection: Keep-Alive
+Keep-Alive: timeout=5, max=1000
+Server: viola
+        """
+        self.c_socket.send(msg)
 
 # def _handle_connection(self, fd, event):
 #         if event & EventLoop.READ:
