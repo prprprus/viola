@@ -4,6 +4,10 @@ from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
 
 
+class EventNotExistsException(Exception):
+    pass
+
+
 class Stream(object):
     def __init__(self, c_socket, event_loop, url_views, keepalive,
                  max_buffer_size=104857600, chunk_size=4096):
@@ -22,21 +26,21 @@ class Stream(object):
                                     self.handle_event)
 
     def handle_event(self, fd, event):
-        try:
-            if event & EventLoop.READ:
-                self.handle_read()
-                # 将读写处理完毕的 stream 丢给 `http_handler`
-                if self.read_buffer:
-                    HttpHandler(self, self.event_loop, self.url_views)
-            elif event & EventLoop.WRITE:
+        if event & EventLoop.READ:
+            self.handle_read()
+            # 将读写处理完毕的 stream 丢给 `http_handler`
+            if self.read_buffer:
+                HttpHandler(self, self.event_loop, self.url_views)
+        elif event & EventLoop.WRITE:
+            if self.write_buffer:
                 self.handle_write()
-            elif event & EventLoop.ERROR:
-                print("epoll error, close it")
-                raise
-        except:
-            print("handle_event function error, close it")
+        elif event & EventLoop.ERROR:
+            print("epoll error, close it")
             self.handle_error()
             raise
+        else:
+            self.handle_error()
+            raise EventNotExistsException
 
     def handle_read(self):
         """循环读直到读到 0 个字节或者读到 EGAIN 为止"""
@@ -67,21 +71,20 @@ class Stream(object):
             print('fuxk')
             raise
         finally:
-            self.handle_error()
+            try:
+                self.event_loop.scheduler.add_task(3, self.test_task)
+            except:
+                raise
+            finally:
+                self.handle_error()
         # print(self.event_loop.handlers)
 
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
 
-    def response_keepalive(self):
-        msg = b"""
-HTTP/1.1 200 OK
-Connection: Keep-Alive
-Keep-Alive: timeout=5, max=1000
-Server: viola
-        """
-        self.c_socket.send(msg)
+    def test_task(self):
+        print("hello")
 
 # def _handle_connection(self, fd, event):
 #         if event & EventLoop.READ:

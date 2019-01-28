@@ -53,18 +53,12 @@ class EventLoop(object):
 
     def start(self):
         while True:
-            # if self.scheduler.tasks:
-            #     now = time.time()
-            #     while self.scheduler.tasks and \
-            #             (self.scheduler.tasks[0].deadline <= now):
-            #         print("-------------")
-            #         print(self.scheduler.tasks)
-            #         print(self.scheduler.running)
-            #         print(self.scheduler.tasks[0].deadline)
-            #         print(now)
-            #         print("-------------")
-            #         self.scheduler.tasks[0].callback()
-            #         self.scheduler.tasks.popleft()
+            if self.scheduler.tasks:
+                now = time.time()
+                while self.scheduler.tasks and \
+                        (self.scheduler.tasks[0].deadline <= now):
+                    self.scheduler.tasks[0].callback()
+                    self.scheduler.tasks.popleft()
 
             # Priority run task if interval less than `timeout`
             # if self.scheduler.tasks:

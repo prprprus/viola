@@ -45,5 +45,6 @@ if __name__ == '__main__':
     server = HttpServer(event_loop, url_views, keepalive=False)    # 这个 router 的传递路线值得慢慢体会, 理解面向对象之间的通信方式
     server.bind(host="10.211.55.25", port=2333)
     server.listen(9128)
-    server.start(os.cpu_count())
+    # server.start(os.cpu_count())
+    server.start(1)
     event_loop.start()
