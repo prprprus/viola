@@ -13,6 +13,7 @@ class HttpHandler(object):
         self.stream = stream
         self.event_loop = event_loop
         self.url_views = url_views
+        self.route()
 
     def route(self):
         """路由"""

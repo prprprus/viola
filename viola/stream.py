@@ -27,16 +27,15 @@ class Stream(object):
                 self.handle_read()
                 # 将读写处理完毕的 stream 丢给 `http_handler`
                 if self.read_buffer:
-                    HttpHandler(self, self.event_loop, self.url_views).route()
+                    HttpHandler(self, self.event_loop, self.url_views)
             elif event & EventLoop.WRITE:
                 self.handle_write()
             elif event & EventLoop.ERROR:
                 print("epoll error, close it")
-                self.c_socket.close()
                 raise
         except:
-            print("c_socket error, close it")
-            self.c_socket.close()
+            print("handle_event function error, close it")
+            self.handle_error()
             raise
 
     def handle_read(self):
@@ -49,7 +48,7 @@ class Stream(object):
                 break
             except:
                 print("c_socket recv error, close it")
-                self.c_socket.close()
+                self.handle_error()
                 raise
             if len(chunk) > 0:
                 self.read_buffer.append(chunk)
@@ -66,11 +65,9 @@ class Stream(object):
         except:
             print("c_socket send error, close it")
             print('fuxk')
-            self.c_socket.close()
             raise
         finally:
-            self.event_loop.remove_handler(self.c_socket.fileno())
-            self.c_socket.close()
+            self.handle_error()
         # print(self.event_loop.handlers)
 
     def handle_error(self):
