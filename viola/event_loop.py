@@ -13,17 +13,18 @@ class EventLoop(object):
     ERROR = Epoll.ERROR
     ET = Epoll.ET
 
-    def __init__(self):
+    @classmethod
+    def instance(cls, scheduler):
+        """Singleton mode"""
+        if not hasattr(cls, "_instance"):
+            cls._instance = cls(scheduler)
+        return cls._instance
+
+    def __init__(self, scheduler):
         self.epoll = Epoll()
         self.handlers = {}
         self.timeout = 0.2
-
-    @classmethod
-    def instance(cls):
-        """Singleton mode"""
-        if not hasattr(cls, "_instance"):
-            cls._instance = cls()
-        return cls._instance
+        self.scheduler = scheduler
 
     def add_handler(self, fd, events, handler):
         """
@@ -50,6 +51,10 @@ class EventLoop(object):
         # print("[update_handler]", self.handlers)
 
     def start(self):
+        print("-------------")
+        print(self.scheduler.tasks)
+        print(self.scheduler.running)
+        print("-------------")
         while True:
             events = self.epoll.poll(self.timeout)
             for fd, event in events:

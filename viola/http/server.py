@@ -12,14 +12,14 @@ class RouterEmptyException(Exception):
 
 class HttpServer(object):
 
-    def __init__(self, url_views, keepalive=False):
+    def __init__(self, event_loop, url_views, keepalive=False):
         self.s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         flags = fcntl.fcntl(self.s_socket.fileno(), fcntl.F_GETFD)
         flags |= fcntl.FD_CLOEXEC
         fcntl.fcntl(self.s_socket.fileno(), fcntl.F_SETFD)
         self.s_socket.setblocking(0)
         self.s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.event_loop = EventLoop.instance()
+        self.event_loop = event_loop
         if not url_views:
             raise RouterEmptyException
         self.url_views = url_views
@@ -46,9 +46,11 @@ class HttpServer(object):
                     return
                 else:
                     os.waitpid(-1, 0)
+                    # self.event_loop.start()
         else:
             self.event_loop.add_handler(self.s_socket.fileno(), EventLoop.READ,
                                         self.handle_event)
+            # self.event_loop.start()
 
     def stop(self):
         pass

@@ -3,6 +3,7 @@ from viola.event_loop import EventLoop
 from viola.http.server import HttpServer
 import json
 import os
+from viola.scheduler import Scheduler
 
 
 resp_data = b"""
@@ -32,9 +33,9 @@ url_views["/favicon.ico"] = get
 
 
 if __name__ == '__main__':
-    server = HttpServer(url_views, keepalive=False)    # 这个 router 的传递路线值得慢慢体会, 理解面向对象之间的通信方式
+    event_loop = EventLoop.instance(Scheduler.instance())
+    server = HttpServer(event_loop, url_views, keepalive=False)    # 这个 router 的传递路线值得慢慢体会, 理解面向对象之间的通信方式
     server.bind(host="10.211.55.25", port=2333)
     server.listen(9128)
     server.start(os.cpu_count())
-    event_loop = EventLoop.instance()
     event_loop.start()
