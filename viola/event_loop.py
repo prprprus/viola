@@ -20,7 +20,7 @@ class EventLoop(object):
 
     @classmethod
     def instance(cls):
-        """Singleton"""
+        """Singleton mode"""
         if not hasattr(cls, "_instance"):
             cls._instance = cls()
         return cls._instance
