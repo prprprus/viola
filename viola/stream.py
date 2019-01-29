@@ -49,7 +49,6 @@ class Stream(object):
             raise EventException
 
     def handle_read(self):
-        """循环读直到读到 0 个字节或者读到 EGAIN 为止"""
         while True:
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
