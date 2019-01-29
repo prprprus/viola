@@ -36,7 +36,7 @@ class Stream(object):
             # 将读写处理完毕的 stream 丢给 `http_handler`
             if self.read_buffer:
                 HttpHandler(self, self.event_loop, self.url_views)
-            # 异常处理? 防止疯狂 ab 时(超高并发)造成 CPU 飙高
+            # 异常处理? 防止疯狂 ab 时(超高并发)读就绪造成 CPU 飙高
             else:
                 self.release()
         elif event & EventLoop.WRITE:
