@@ -32,4 +32,4 @@ class KeepAlive(object):
     def close_conn(self):
         self.event_loop.remove_handler(self.conn.fileno())
         self.conn.close()
-        print("fuxk")
+        # print("fuxk")
