@@ -6,19 +6,19 @@ import os
 from viola.scheduler import Scheduler
 
 
-# resp_data = b"""
-# HTTP/1.1 200 OK
-
-# {"result": "ok"}
-# """
-
 resp_data = b"""
 HTTP/1.1 200 OK
-Connection: Keep-Alive
-Keep-Alive: timeout=5, max=1000
 
 {"result": "ok"}
 """
+
+# resp_data = b"""
+# HTTP/1.1 200 OK
+# Connection: Keep-Alive
+# Keep-Alive: timeout=5, max=1000
+
+# {"result": "ok"}
+# """
 
 # Mock web framework
 url_views = {}
@@ -28,8 +28,10 @@ def get(request, response):
     # print("[headers]", request.headers)
     # for k, v in request.headers.items():
     #     print(k + ':', v)
-    # response.write(resp_data)
-    response.write(resp_data + b'{"result": "ok"}'*9999999)
+    # 小数据
+    response.write(resp_data)
+    # 大数据
+    # response.write(resp_data + b'{"result": "ok"}'*9999999)
 
 
 def post(*args, **kwargs):

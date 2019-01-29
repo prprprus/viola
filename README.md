@@ -22,3 +22,11 @@ Hi guys, viola is a epoll-based event loop http server.
 - 事件驱动的并发模型. 压测通过
 - 解析 HTTP GET 请求
 - keep-Alive
+
+# 回归测试
+- 无 keep-Alive
+    - 小数据量
+    - 大数据量
+- 有 keep-Alive
+    - 小数据量
+    - 大数据量(不适合)

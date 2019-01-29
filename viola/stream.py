@@ -77,18 +77,15 @@ class Stream(object):
                 data = self.write_buffer[0]
                 # 判断发送缓冲区和 write_buffer 大小关系
                 if len(data) <= self.sndbuff:
-                    print("jio...")
                     self.c_socket.send(data)
                     self.write_buffer.popleft()
                 else:
                     size = self.c_socket.send(data)
                     self.write_buffer[0] = self.write_buffer[0][size:]
-                    # print("fuxk")
-                    # print(size)
         except BlockingIOError: # sndbuff 满了
             # print("Write BlockingIOError ignore it")
             pass
-        except ConnectionResetError, BrokenPipeError:   # 客户端异常关闭了连接
+        except (ConnectionResetError, BrokenPipeError):   # 客户端异常关闭了连接
             # print("Write ConnectionResetError, BrokenPipeError")
             self.recycle()
         except:
@@ -102,10 +99,12 @@ class Stream(object):
                     events = EventLoop.READ
                     self.event_loop.update_handler(self.c_socket.fileno(),
                                                    events)
-                # 若客户端出现异常, 则异常处理已经关闭了连接. 这里也就无需再 KeepAlive
-                if (self.c_socket.fileno() != -1) and \
-                        KeepAlive.not_exists(self.c_socket):
-                    KeepAlive(self.c_socket, self.event_loop)
+                if KeepAlive.not_exists(self.c_socket):
+                    # 若客户端出现异常, 则异常处理已经关闭了连接. 这里也就无需再 KeepAlive
+                    try:
+                        KeepAlive(self.c_socket, self.event_loop)
+                    except OSError:
+                        pass
             else:
                 # 若是大文件, 数据一般需要写多次, 则先不关闭连接
                 if not self.write_buffer:
