@@ -36,6 +36,7 @@ class Stream(object):
             self.handle_write()
         elif event & EventLoop.ERROR:
             print("epoll error, close it")
+            print(event)
             self.handle_error()
             raise
         else:
@@ -45,11 +46,15 @@ class Stream(object):
     def handle_read(self):
         """循环读直到读到 0 个字节或者读到 EGAIN 为止"""
         while True:
+            chunk = b''
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
             except BlockingIOError:
                 # print("BlockingIOError ignore it")
                 break
+            except ConnectionResetError:
+                # print("Read ConnectionResetError")
+                self.handle_error()
             except:
                 print("c_socket recv error, close it")
                 self.handle_error()
@@ -70,8 +75,11 @@ class Stream(object):
             raise
         finally:
             if self.keepalive:
-                events = EventLoop.READ
-                self.event_loop.update_handler(self.c_socket.fileno(), events)
+                # 数据没写完则不修改监听事件
+                if not self.write_buffer:
+                    events = EventLoop.READ
+                    self.event_loop.update_handler(self.c_socket.fileno(),
+                                                   events)
                 if KeepAlive.not_exists(self.c_socket):
                     KeepAlive(self.c_socket, self.event_loop)
             else:
