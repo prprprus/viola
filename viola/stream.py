@@ -69,7 +69,6 @@ class Stream(object):
             print('fuxk')
             raise
         finally:
-            # keepalive
             if self.keepalive:
                 events = EventLoop.READ
                 self.event_loop.update_handler(self.c_socket.fileno(), events)
