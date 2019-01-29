@@ -6,7 +6,7 @@ from viola.http.keepalive import KeepAlive
 import socket
 
 
-class EventNotExistsException(Exception):
+class EventException(Exception):
     pass
 
 
@@ -25,8 +25,10 @@ class Stream(object):
         events = EventLoop.READ
         self.event_loop.add_handler(self.c_socket.fileno(), events,
                                     self.handle_event)
-        # print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF))  # 2.5M
-        # print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF))  # 1M
+        self.sndbuff = self.c_socket.getsockopt(socket.SOL_SOCKET,
+                                                socket.SO_SNDBUF)
+        self.revbuff = self.c_socket.getsockopt(socket.SOL_SOCKET,
+                                                socket.SO_RCVBUF)
 
     def handle_event(self, fd, event):
         if event & EventLoop.READ:
@@ -39,13 +41,12 @@ class Stream(object):
             self.handle_write()
         # 怎么处理?
         elif event & EventLoop.ERROR:
-            print("epoll error, close it")
-            print(event)
-            self.handle_error()
+            # print("epoll error, close it")
+            self.recycle()
             raise
         else:
-            self.handle_error()
-            raise EventNotExistsException
+            self.recycle()
+            raise EventException
 
     def handle_read(self):
         """循环读直到读到 0 个字节或者读到 EGAIN 为止"""
@@ -53,15 +54,18 @@ class Stream(object):
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
             except BlockingIOError:
-                # print("BlockingIOError ignore it")
+                # print("Read BlockingIOError ignore it")
                 break
+            # KEEPALIVE 且高并发下客户端可能会关闭连接(如果 ab 压测时)
             except ConnectionResetError:
                 # print("Read ConnectionResetError")
-                self.handle_error()
-                continue
+                self.recycle()
+                # break 防止 ConnectionResetError 造成的 UnboundLocalError:
+                # local variable 'chunk' referenced before assignment 异常
+                break
             except:
-                print("c_socket recv error, close it")
-                self.handle_error()
+                # print("c_socket recv error, close it")
+                self.recycle()
                 raise
             if len(chunk) > 0:
                 self.read_buffer.append(chunk)
@@ -71,15 +75,26 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
+                data = self.write_buffer[0]
                 # 判断发送缓冲区和 write_buffer 大小关系
-                size = self.c_socket.send(self.write_buffer[0])
-                if size == len(self.write_buffer[0]):
+                if len(data) <= self.sndbuff:
+                    print("jio...")
+                    self.c_socket.send(data)
                     self.write_buffer.popleft()
                 else:
+                    size = self.c_socket.send(data)
                     self.write_buffer[0] = self.write_buffer[0][size:]
+                    # print("fuxk")
+                    # print(size)
+        except BlockingIOError: # sndbuff 满了
+            # print("Write BlockingIOError ignore it")
+            pass
+        except ConnectionResetError, BrokenPipeError:   # 客户端异常关闭了连接
+            # print("Write ConnectionResetError, BrokenPipeError")
+            self.recycle()
         except:
-            print("c_socket send error, close it")
-            print('fuxk')
+            # print("c_socket send error, close it")
+            self.recycle()
             raise
         finally:
             if self.keepalive:
@@ -88,13 +103,15 @@ class Stream(object):
                     events = EventLoop.READ
                     self.event_loop.update_handler(self.c_socket.fileno(),
                                                    events)
-                if KeepAlive.not_exists(self.c_socket):
+                # 若客户端出现异常, 则异常处理已经关闭了连接. 这里也就无需再 KeepAlive
+                if (self.c_socket.fileno() != -1) and \
+                        KeepAlive.not_exists(self.c_socket):
                     KeepAlive(self.c_socket, self.event_loop)
             else:
-                # 数据还没写完则不关闭连接
+                # 若是大文件, 数据一般需要写多次, 则先不关闭连接
                 if not self.write_buffer:
-                    self.handle_error()
+                    self.recycle()
 
-    def handle_error(self):
+    def recycle(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
