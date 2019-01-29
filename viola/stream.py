@@ -34,18 +34,20 @@ class Stream(object):
         if event & EventLoop.READ:
             self.handle_read()
             # 将读写处理完毕的 stream 丢给 `http_handler`
-            # 异常处理?
             if self.read_buffer:
                 HttpHandler(self, self.event_loop, self.url_views)
+            # 异常处理? 防止疯狂 ab 时(超高并发)造成 CPU 飙高
+            else:
+                self.release()
         elif event & EventLoop.WRITE:
             self.handle_write()
         # 怎么处理?
         elif event & EventLoop.ERROR:
             # print("epoll error, close it")
-            self.recycle()
+            self.release()
             raise
         else:
-            self.recycle()
+            self.release()
             raise EventException
 
     def handle_read(self):
@@ -58,13 +60,13 @@ class Stream(object):
             # KEEPALIVE 且高并发下客户端可能会关闭连接(如果 ab 压测时)
             except ConnectionResetError:
                 # print("Read ConnectionResetError")
-                self.recycle()
+                self.release()
                 # break 防止 ConnectionResetError 造成的 UnboundLocalError:
                 # local variable 'chunk' referenced before assignment 异常
                 break
             except:
                 # print("c_socket recv error, close it")
-                self.recycle()
+                self.release()
                 raise
             if len(chunk) > 0:
                 self.read_buffer.append(chunk)
@@ -87,10 +89,10 @@ class Stream(object):
             pass
         except (ConnectionResetError, BrokenPipeError):   # 客户端异常关闭了连接
             # print("Write ConnectionResetError, BrokenPipeError")
-            self.recycle()
+            self.release()
         except:
             # print("c_socket send error, close it")
-            self.recycle()
+            self.release()
             raise
         finally:
             if self.keepalive:
@@ -108,8 +110,8 @@ class Stream(object):
             else:
                 # 若是大文件, 数据一般需要写多次, 则先不关闭连接
                 if not self.write_buffer:
-                    self.recycle()
+                    self.release()
 
-    def recycle(self):
+    def release(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()

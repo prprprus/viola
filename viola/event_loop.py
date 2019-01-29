@@ -60,7 +60,6 @@ class EventLoop(object):
                 poll_timeout = min(interval, poll_timeout)
 
             events = self.epoll.poll(poll_timeout)
-            # print(events)
             for fd, event in events:
                 self.handlers[fd](fd, event)    # Event already and run callback
 
