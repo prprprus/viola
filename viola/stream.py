@@ -3,6 +3,7 @@ import collections
 from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
 from viola.http.keepalive import KeepAlive
+import socket
 
 
 class EventNotExistsException(Exception):
@@ -24,6 +25,8 @@ class Stream(object):
         events = EventLoop.READ
         self.event_loop.add_handler(self.c_socket.fileno(), events,
                                     self.handle_event)
+        # print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF))  # 2.5M
+        # print(self.c_socket.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF))  # 1M
 
     def handle_event(self, fd, event):
         if event & EventLoop.READ:
@@ -34,6 +37,7 @@ class Stream(object):
                 HttpHandler(self, self.event_loop, self.url_views)
         elif event & EventLoop.WRITE:
             self.handle_write()
+        # 怎么处理?
         elif event & EventLoop.ERROR:
             print("epoll error, close it")
             print(event)
@@ -46,7 +50,6 @@ class Stream(object):
     def handle_read(self):
         """循环读直到读到 0 个字节或者读到 EGAIN 为止"""
         while True:
-            chunk = b''
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
             except BlockingIOError:
@@ -55,6 +58,7 @@ class Stream(object):
             except ConnectionResetError:
                 # print("Read ConnectionResetError")
                 self.handle_error()
+                continue
             except:
                 print("c_socket recv error, close it")
                 self.handle_error()
@@ -67,8 +71,12 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
-                self.c_socket.send(self.write_buffer[0])
-                self.write_buffer.popleft()
+                # 判断发送缓冲区和 write_buffer 大小关系
+                size = self.c_socket.send(self.write_buffer[0])
+                if size == len(self.write_buffer[0]):
+                    self.write_buffer.popleft()
+                else:
+                    self.write_buffer[0] = self.write_buffer[0][size:]
         except:
             print("c_socket send error, close it")
             print('fuxk')
@@ -83,7 +91,9 @@ class Stream(object):
                 if KeepAlive.not_exists(self.c_socket):
                     KeepAlive(self.c_socket, self.event_loop)
             else:
-                self.handle_error()
+                # 数据还没写完则不关闭连接
+                if not self.write_buffer:
+                    self.handle_error()
 
     def handle_error(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
