@@ -4,14 +4,7 @@ from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
 from viola.http.keepalive import KeepAlive
 import socket
-from viola.exception import (
-    ViolaEventException,
-    ViolaReadBlockingIOError,
-    ViolaReadConnectionResetError,
-    ViolaWriteBlockingIOError,
-    ViolaWriteConnectionResetError,
-    ViolaBrokenPipeError
-)
+from viola.exception import ViolaEventException
 
 
 class Stream(object):
@@ -55,24 +48,24 @@ class Stream(object):
             raise ViolaEventException
 
     def handle_read(self):
-        while True:
-            try:
+        try:
+            while True:
                 chunk = self.c_socket.recv(self.chunk_size)
-            except ViolaReadBlockingIOError:
-                # print("ViolaReadBlockingIOError ignore it")
-                break
-            except ViolaReadConnectionResetError:
-                # print("ViolaReadConnectionResetError")
-                self.release()
-                break
-            except:
-                # print("c_socket recv error, close it")
-                self.release()
-                raise
-            if len(chunk) > 0:
-                self.read_buffer.append(chunk)
-            else:
-                break
+                if len(chunk) > 0:
+                    self.read_buffer.append(chunk)
+                # chunk 等于 '' 时主动退出循环
+                else:
+                    break
+        except BlockingIOError:
+            # print("ViolaReadBlockingIOError ignore it")
+            pass
+        except ConnectionResetError:
+            # print("ViolaReadConnectionResetError")
+            self.release()
+        except:
+            # print("c_socket recv error, close it")
+            self.release()
+            raise
 
     def handle_write(self):
         try:
@@ -85,11 +78,11 @@ class Stream(object):
                 else:
                     size = self.c_socket.send(data)
                     self.write_buffer[0] = self.write_buffer[0][size:]
-        except ViolaWriteBlockingIOError:
+        except BlockingIOError:
             # print("ViolaWriteBlockingIOError ignore it")
             pass
-        except (ViolaWriteConnectionResetError,
-                ViolaBrokenPipeError):
+        except (ConnectionResetError,
+                BrokenPipeError):
             # print("ViolaWriteConnectionResetError, ViolaBrokenPipeError")
             self.release()
         except:
