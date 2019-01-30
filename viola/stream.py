@@ -53,13 +53,13 @@ class Stream(object):
                 chunk = self.c_socket.recv(self.chunk_size)
                 if len(chunk) > 0:
                     self.read_buffer.append(chunk)
-                # chunk 等于 '' 时主动退出循环
                 else:
-                    break
+                    break    # chunk 等于 '' 时主动退出循环
         except BlockingIOError:
             # print("ViolaReadBlockingIOError ignore it")
             pass
-        except ConnectionResetError:
+        except (ConnectionResetError,
+                BrokenPipeError):
             # print("ViolaReadConnectionResetError")
             self.release()
         except:
