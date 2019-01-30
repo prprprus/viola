@@ -4,10 +4,14 @@ from viola.event_loop import EventLoop
 from viola.http.handler import HttpHandler
 from viola.http.keepalive import KeepAlive
 import socket
-
-
-class EventException(Exception):
-    pass
+from viola.exception import (
+    ViolaEventException,
+    ViolaReadBlockingIOError,
+    ViolaReadConnectionResetError,
+    ViolaWriteBlockingIOError,
+    ViolaWriteConnectionResetError,
+    ViolaBrokenPipeError
+)
 
 
 class Stream(object):
@@ -48,21 +52,18 @@ class Stream(object):
             raise
         else:
             self.release()
-            raise EventException
+            raise ViolaEventException
 
     def handle_read(self):
         while True:
             try:
                 chunk = self.c_socket.recv(self.chunk_size)
-            except BlockingIOError:
-                # print("Read BlockingIOError ignore it")
+            except ViolaReadBlockingIOError:
+                # print("ViolaReadBlockingIOError ignore it")
                 break
-            # KEEPALIVE 且高并发下客户端可能会关闭连接(如果 ab 压测时)
-            except ConnectionResetError:
-                # print("Read ConnectionResetError")
+            except ViolaReadConnectionResetError:
+                # print("ViolaReadConnectionResetError")
                 self.release()
-                # break 防止 ConnectionResetError 造成的 UnboundLocalError:
-                # local variable 'chunk' referenced before assignment 异常
                 break
             except:
                 # print("c_socket recv error, close it")
@@ -84,11 +85,12 @@ class Stream(object):
                 else:
                     size = self.c_socket.send(data)
                     self.write_buffer[0] = self.write_buffer[0][size:]
-        except BlockingIOError: # sndbuff 满了
-            # print("Write BlockingIOError ignore it")
+        except ViolaWriteBlockingIOError:
+            # print("ViolaWriteBlockingIOError ignore it")
             pass
-        except (ConnectionResetError, BrokenPipeError):   # 客户端异常关闭了连接
-            # print("Write ConnectionResetError, BrokenPipeError")
+        except (ViolaWriteConnectionResetError,
+                ViolaBrokenPipeError):
+            # print("ViolaWriteConnectionResetError, ViolaBrokenPipeError")
             self.release()
         except:
             # print("c_socket send error, close it")
