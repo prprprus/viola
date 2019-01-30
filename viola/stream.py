@@ -58,10 +58,12 @@ class Stream(object):
 
     def handle_read(self):
         try:
-            # 默认读一次就是一个完整的请求
-            chunk = self.c_socket.recv(self.chunk_size)
-            if len(chunk) > 0:
-                self.read_buffer.append(chunk)
+            while True:
+                chunk = self.c_socket.recv(self.chunk_size)
+                if len(chunk) > 0:
+                    self.read_buffer.append(chunk)
+                else:
+                    break    # chunk 等于 '' 时主动退出循环
         except BlockingIOError:
             # print("ViolaReadBlockingIOError ignore it")
             pass
