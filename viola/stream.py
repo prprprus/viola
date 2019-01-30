@@ -33,7 +33,10 @@ class Stream(object):
             # 将读写处理完毕的 stream 丢给 `http_handler`
             if self.read_buffer:
                 HttpHandler(self, self.event_loop, self.url_views)
-            # 异常处理? 防止疯狂 ab 时(超高并发)读就绪造成 CPU 飙高
+            # 由于读数据时是采取尽可能多的读, 没有使用把请求分开一个一个地读, 所以当请求的数据量远远小于 chunk_size 时,
+            # 很容易会发生一次读就读了若干个请求数据, 剩下的读就绪事件没数据可以读, 就会造成读就绪事件饥饿.
+            # 这里的 `break` 就是为了防止读就绪事件饥饿.
+            # (现象就是大量饥饿的读就绪事件造成 CPU 飙高, 从而造成服务器无法处理后续的请求. 可以通过连续疯狂 ab 来重现这个现象)
             else:
                 self.release()
         elif event & EventLoop.WRITE:
