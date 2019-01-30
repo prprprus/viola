@@ -10,13 +10,14 @@ from viola.http.response import HttpResponse
 
 class HttpHandler(object):
 
-    def __init__(self, stream, event_loop, url_views):
+    def __init__(self, stream, event_loop, url_views, http_req):
         self.stream = stream
         self.event_loop = event_loop
         self.url_views = url_views
+        self.http_req = http_req
         self.route()
 
     def route(self):
-        request = HttpRequest(self.stream.read_buffer)
+        request = HttpRequest(self.http_req)
         response = HttpResponse(self.stream, self.event_loop)
         self.url_views[request.headers["url"]](request, response)

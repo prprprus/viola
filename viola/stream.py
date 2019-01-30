@@ -15,8 +15,9 @@ class Stream(object):
         self.event_loop = event_loop
         self.url_views = url_views
         self.keepalive = keepalive
-        self.read_buffer = collections.deque()    # HTTP request read buffer
-        self.write_buffer = collections.deque()    # HTTP response write buffer
+        self.read_buffer = collections.deque()
+        self.wrough_rebuff = collections.deque()
+        self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
         events = EventLoop.READ
@@ -29,10 +30,14 @@ class Stream(object):
 
     def handle_event(self, fd, event):
         if event & EventLoop.READ:
+            # print(1)
             self.handle_read()
             # 将读写处理完毕的 stream 丢给 `http_handler`
-            if self.read_buffer:
-                HttpHandler(self, self.event_loop, self.url_views)
+            if self.read_buffer or self.wrough_rebuff:
+                self.read_from_buffer(self.read_buffer)
+                HttpHandler(self, self.event_loop, self.url_views,
+                            self.wrough_rebuff[0])
+                self.wrough_rebuff.popleft()
             # 由于读数据时是采取尽可能多的读, 没有使用把请求分开一个一个地读, 所以当请求的数据量远远小于 chunk_size 时,
             # 很容易会发生一次读就读了若干个请求数据, 剩下的读就绪事件没数据可以读, 就会造成读就绪事件饥饿.
             # 这里的 `break` 就是为了防止读就绪事件饥饿.
@@ -40,6 +45,7 @@ class Stream(object):
             else:
                 self.release()
         elif event & EventLoop.WRITE:
+            # print(2)
             self.handle_write()
         # 怎么处理?
         elif event & EventLoop.ERROR:
@@ -52,12 +58,10 @@ class Stream(object):
 
     def handle_read(self):
         try:
-            while True:
-                chunk = self.c_socket.recv(self.chunk_size)
-                if len(chunk) > 0:
-                    self.read_buffer.append(chunk)
-                else:
-                    break    # chunk 等于 '' 时主动退出循环
+            # 默认读一次就是一个完整的请求
+            chunk = self.c_socket.recv(self.chunk_size)
+            if len(chunk) > 0:
+                self.read_buffer.append(chunk)
         except BlockingIOError:
             # print("ViolaReadBlockingIOError ignore it")
             pass
@@ -113,3 +117,17 @@ class Stream(object):
     def release(self):
         self.event_loop.remove_handler(self.c_socket.fileno())
         self.c_socket.close()
+
+    def read_from_buffer(self, read_buffer):
+        """整理出完整的 GET 请求"""
+        # GET
+        delimiter = "\r\n\r\n"
+        if read_buffer:
+            str_rebuff = ""
+            for rb in self.read_buffer:
+                str_rebuff += rb.decode("utf8")
+            # 过滤 `split()` 后的 "" 字符串
+            [self.wrough_rebuff.append(x) for x in str_rebuff.split(delimiter)
+             if x.replace(" ", "")]
+        # POST
+        # TODO

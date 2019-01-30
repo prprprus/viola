@@ -1,7 +1,7 @@
 # encoding=utf8
 """
-- 接收 handler 模块的输入: read_buffer
-- 按照 HTTP 协议解析 read_buffer
+- 接收 handler 模块的输入: http_req
+- 按照 HTTP 协议解析 http_req
 - 将解析结果封装成 `HttpRequest` 对象并返回
 """
 import io
@@ -20,8 +20,8 @@ class Parser(object):
                    "PUT", "DELETE", "TRACE", "CONNECT"]
     HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
 
-    def __init__(self, request_buffer):
-        self.request_buffer = request_buffer
+    def __init__(self, http_req):
+        self.http_req = http_req
         self.headers = {}
         self.env = {}
 
@@ -37,7 +37,11 @@ class Parser(object):
 
     def _parse_headers(self):
         """解析 HTTP header 信息"""
-        req_cont = io.StringIO(self.request_buffer.popleft().decode("utf8"))
+        # if not self.http_req:
+        #     print("------------")
+        #     print(self.http_req)
+        #     print("------------")
+        req_cont = io.StringIO(self.http_req)
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')
             if line:
@@ -82,9 +86,9 @@ class Parser(object):
 
 
 class HttpRequest(object):
-    def __init__(self, read_buffer):
-        self.read_buffer = read_buffer
-        self.parser = Parser(self.read_buffer)
+    def __init__(self, http_req):
+        self.http_req = http_req
+        self.parser = Parser(self.http_req)
         result = self.parser.parse_request()
         self.headers = result["headers"]
         self.env = result["env"]
