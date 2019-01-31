@@ -20,6 +20,8 @@ class EventLoop(object):
         self.epoll = Epoll()
         self.handlers = {}
         self.scheduler = scheduler
+        self._stop = False
+        self._running = False
 
     def add_handler(self, fd, events, handler):
         """
@@ -43,22 +45,37 @@ class EventLoop(object):
         self.epoll.modify(fd, events | EventLoop.ERROR)
 
     def start(self):
+        if self._stop:
+            self._stop = False
+            return
+        self._running = True
+
         while True:
             poll_timeout = 0.2
+
+            # Add callback task
+            pass
+
+            # Run scheduler task
             now = time.time()
             while self.scheduler.tasks and \
                     (self.scheduler.tasks[0].deadline <= now):
                 self.scheduler.tasks[0].callback()  # Add try-catch
                 self.scheduler.tasks.popleft()
-
             # Priority run task if interval less than `timeout`
             if self.scheduler.tasks:
                 interval = self.scheduler.tasks[0].deadline - now
                 poll_timeout = min(interval, poll_timeout)
 
+            # If run `stop()` somewhere, break event loop
+            if not self._running:
+                break
+
+            # Start event loop
             events = self.epoll.poll(poll_timeout)
             for fd, event in events:
                 self.handlers[fd](fd, event)    # Event already and run callback
 
     def stop(self):
-        pass
+        self._stop = True
+        self._running = False
