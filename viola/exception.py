@@ -11,3 +11,8 @@ class ViolaHTTPMethodException(Exception):
 class ViolaHTTPVersionException(Exception):
     """HTTP version does not exists"""
     pass
+
+
+class ViolaSendDataTypeException(Exception):
+    """Socket `send()` data does not support"""
+    pass

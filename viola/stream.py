@@ -1,19 +1,17 @@
 # encoding=utf8
 import collections
 from viola.event_loop import EventLoop
-from viola.http.handler import HttpHandler
 from viola.http.keepalive import KeepAlive
 import socket
-from viola.exception import ViolaEventException
+from viola.exception import ViolaSendDataTypeException
 
 
-class Stream(object):
-    def __init__(self, c_socket, event_loop, url_views, keepalive,
+class TCPStream(object):
+    def __init__(self, c_socket, event_loop, keepalive,
                  max_buffer_size=104857600, chunk_size=4096):
         self.c_socket = c_socket
         self.c_socket.setblocking(0)
         self.event_loop = event_loop
-        self.url_views = url_views
         self.keepalive = keepalive
         self.read_buffer = collections.deque()
         self.wrough_rebuff = collections.deque()
@@ -28,32 +26,7 @@ class Stream(object):
                                                 socket.SO_RCVBUF)
 
     def handle_event(self, fd, event):
-        if event & EventLoop.READ:
-            # print(1)
-            self.handle_read()
-            # 将读写处理完毕的 stream 丢给 `http_handler`
-            if self.read_buffer or self.wrough_rebuff:
-                self.read_from_buffer(self.read_buffer)
-                HttpHandler(self, self.event_loop, self.url_views,
-                            self.wrough_rebuff[0])
-                self.wrough_rebuff.popleft()
-            # 由于读数据时是采取尽可能多的读, 尽量减少通知次数, 降低 CPU 使用. 没有使用把请求分开一个一个地读,
-            # 所以当请求的数据量远远小于 chunk_size 时, 很容易会发生一次读就读了若干个请求数据, 剩下的读就绪事件没数据可以读,
-            # 就会造成读就绪事件饥饿. 这里的 `break` 就是为了防止读就绪事件饥饿.
-            # (现象就是大量饥饿的读就绪事件造成 CPU 飙高, 从而造成服务器无法处理后续的请求. 可以通过连续疯狂 ab 来重现这个现象)
-            else:
-                self.release()
-        elif event & EventLoop.WRITE:
-            # print(2)
-            self.handle_write()
-        # 怎么处理?
-        elif event & EventLoop.ERROR:
-            # print("epoll error, close it")
-            self.release()
-            raise
-        else:
-            self.release()
-            raise ViolaEventException
+        raise NotImplementedError
 
     def handle_read(self):
         try:
@@ -78,7 +51,7 @@ class Stream(object):
     def handle_write(self):
         try:
             while self.write_buffer:
-                data = self.write_buffer[0]
+                data = self._repair(self.write_buffer[0])
                 # 判断发送缓冲区和 write_buffer 大小关系
                 if len(data) <= self.sndbuff:
                     self.c_socket.send(data)
@@ -119,7 +92,10 @@ class Stream(object):
         self.c_socket.close()
 
     def read_from_buffer(self, read_buffer):
-        """整理出完整的 GET 请求"""
+        """
+        整理出完整的 GET 请求.
+        这个函数应该从该模块移除, 放到别处
+        """
         # GET
         delimiter = "\r\n\r\n"
         if read_buffer:
@@ -131,3 +107,13 @@ class Stream(object):
              if x.replace(" ", "")]
         # POST
         # TODO
+
+    def _repair(self, data):
+        if isinstance(data, bytes):
+            return data
+        elif isinstance(data, str):
+            return data.encode("utf8")
+        elif isinstance(data, int) or isinstance(data, float):
+            return str(data).encode("utf8")
+        else:
+            raise ViolaSendDataTypeException
