@@ -1,4 +1,3 @@
-# encoding=utf8
 import socket
 from viola.event_loop import EventLoop
 import fcntl

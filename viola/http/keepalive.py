@@ -20,7 +20,7 @@ class KeepAlive(object):
         self.event_loop = event_loop
         self.timeout = timeout
         self.max_count = max_count
-        # TCP Keep-Alive
+        # 确保 TCP Keep-Alive 开启, HTTP Keep-Alive 才有意义
         tcp_keepalive = self.conn.getsockopt(socket.SOL_SOCKET,
                                              socket.SO_KEEPALIVE)
         if tcp_keepalive == 0:
@@ -30,10 +30,10 @@ class KeepAlive(object):
         self.event_loop.scheduler.add_task(self.timeout, self.close_conn)
 
     def close_conn(self):
-        # Client ConnectionResetError for `handle_read`
+        # `stream` 模块的 `handle_read()` 函数遇到 ConnectionResetError
+        # 已经 `release()` 过, 因此这里会抛出 ValueError 异常, 需要捕获并忽略.
         try:
             self.event_loop.remove_handler(self.conn.fileno())
             self.conn.close()
-            # print("fuxk")
         except ValueError:
             pass

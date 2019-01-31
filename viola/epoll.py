@@ -9,7 +9,6 @@ except ImportError:
 
 
 class Epoll(object):
-    # Constant of epoll module
     READ = select.EPOLLIN
     WRITE = select.EPOLLOUT
     ERROR = select.EPOLLERR | select.EPOLLHUP | select.EPOLLRDHUP

@@ -5,14 +5,10 @@
 - 将解析结果封装成 `HttpRequest` 对象并返回
 """
 import io
-
-
-class HTTPMethodException(Exception):
-    pass
-
-
-class HTTPVersionException(Exception):
-    pass
+from viola.exception import (
+    ViolaHTTPMethodException,
+    ViolaHTTPVersionException
+)
 
 
 class Parser(object):
@@ -37,10 +33,6 @@ class Parser(object):
 
     def _parse_headers(self):
         """解析 HTTP header 信息"""
-        # if not self.http_req:
-        #     print("------------")
-        #     print(self.http_req)
-        #     print("------------")
         req_cont = io.StringIO(self.http_req)
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')
@@ -59,7 +51,7 @@ class Parser(object):
     def _parse_method(self, method):
         """解析请求方法"""
         if method not in Parser.HTTP_METHOD:
-            raise HTTPMethodException
+            raise ViolaHTTPMethodException
         self.headers["method"] = method
 
     def _parse_arguments(self, url):
@@ -75,7 +67,7 @@ class Parser(object):
     def _parse_version(self, version):
         """解析 HTTP 版本"""
         if version not in Parser.HTTP_VERSION:
-            raise HTTPVersionException
+            raise ViolaHTTPVersionException
         self.headers["version"] = version
 
     def _parse_body(self):

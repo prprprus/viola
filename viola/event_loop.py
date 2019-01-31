@@ -1,10 +1,7 @@
-"""A epoll-based event loop. Use edge trigger mode of epoll"""
+"""A epoll-based event loop. Use LT trigger mode"""
 from viola.epoll import Epoll
 import time
-
-
-class EventsEmptyException(Exception):
-    pass
+from viola.exception import ViolaEventException
 
 
 class EventLoop(object):
@@ -26,11 +23,11 @@ class EventLoop(object):
 
     def add_handler(self, fd, events, handler):
         """
-        Register listen fd to epoll and add handler
-        Addition of EventLoop.ERROR for events
+        Register listen fd to epoll and add handler.
+        Additional EventLoop.ERROR for events
         """
         if not events:
-            raise EventsEmptyException
+            raise ViolaEventException
         self.epoll.register(fd, events | EventLoop.ERROR)
         self.handlers[fd] = handler
 
@@ -40,9 +37,9 @@ class EventLoop(object):
         self.handlers.pop(fd)
 
     def update_handler(self, fd, events):
-        """Update interested event of fd"""
+        """Update interested event for fd"""
         if not events:
-            raise EventsEmptyException
+            raise ViolaEventException
         self.epoll.modify(fd, events | EventLoop.ERROR)
 
     def start(self):
