@@ -14,8 +14,8 @@ class HttpResponse(object):
         # Addition: 超过 SNDBUF 的不给发
         self.wrapper_response(resp_data)
         self.stream.write_buffer.append(resp_data)
-        events = EventLoop.WRITE
-        self.event_loop.update_handler(self.stream.c_socket.fileno(), events)
+        self.event_loop.update_handler(self.stream.c_socket.fileno(),
+                                       EventLoop.WRITE)
 
     def wrapper_response(sefl, resp_data):
         pass

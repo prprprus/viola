@@ -20,8 +20,7 @@ class Stream(object):
         self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
-        events = EventLoop.READ
-        self.event_loop.add_handler(self.c_socket.fileno(), events,
+        self.event_loop.add_handler(self.c_socket.fileno(), EventLoop.READ,
                                     self.handle_event)
         self.sndbuff = self.c_socket.getsockopt(socket.SOL_SOCKET,
                                                 socket.SO_SNDBUF)
@@ -102,9 +101,8 @@ class Stream(object):
             if self.keepalive:
                 # 数据没写完则不修改监听事件
                 if not self.write_buffer:
-                    events = EventLoop.READ
                     self.event_loop.update_handler(self.c_socket.fileno(),
-                                                   events)
+                                                   EventLoop.READ)
                 if KeepAlive.not_exists(self.c_socket):
                     # 若客户端出现异常, 则异常处理已经关闭了连接. 这里也就无需再 KeepAlive
                     try:

@@ -79,3 +79,6 @@ class EventLoop(object):
     def stop(self):
         self._stop = True
         self._running = False
+
+    def get_status(self):
+        return "running" if self._running else "stopped"

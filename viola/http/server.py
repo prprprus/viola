@@ -50,7 +50,8 @@ class HttpServer(object):
                                         self.handle_event)
 
     def stop(self):
-        pass
+        self.event_loop.remove_handler(self.s_socket.fileno())
+        self.s_socket.close()
 
     def handle_event(self, fd, event):
         try:
