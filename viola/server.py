@@ -4,10 +4,6 @@ import fcntl
 import os
 
 
-class RouterEmptyException(Exception):
-    pass
-
-
 class TCPServer(object):
 
     def __init__(self, event_loop, keepalive=False):
