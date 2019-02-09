@@ -1,4 +1,3 @@
-# encoding=utf8
 import bisect
 import time
 from collections import deque

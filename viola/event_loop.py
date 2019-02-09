@@ -67,7 +67,7 @@ class EventLoop(object):
                 interval = self.scheduler.tasks[0].deadline - now
                 poll_timeout = min(interval, poll_timeout)
 
-            # If run `stop()` somewhere, break event loop
+            # If run `stop()` somewhere, exit the event loop
             if not self._running:
                 break
 

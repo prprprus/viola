@@ -1,4 +1,3 @@
-# encoding=utf8
 import collections
 from viola.event_loop import EventLoop
 from viola.http.keepalive import KeepAlive
@@ -28,19 +27,20 @@ class TCPStream(object):
     def handle_event(self, fd, event):
         raise NotImplementedError
 
-    def handle_read(self):
+    def read_from_socket(self):
         try:
             while True:
                 chunk = self.c_socket.recv(self.chunk_size)
                 if len(chunk) > 0:
                     self.read_buffer.append(chunk)
                 else:
-                    break    # chunk 等于 '' 时主动退出循环
+                    # Exit the loop if chunk equal `''`
+                    break
         except BlockingIOError:
             # print("ViolaReadBlockingIOError ignore it")
             pass
-        except (ConnectionResetError,
-                BrokenPipeError):
+        # Client exceptions
+        except (ConnectionResetError, BrokenPipeError):
             # print("ViolaReadConnectionResetError")
             self.release()
         except:
@@ -48,11 +48,11 @@ class TCPStream(object):
             self.release()
             raise
 
-    def handle_write(self):
+    def write_to_socket(self):
         try:
             while self.write_buffer:
                 data = self._repair(self.write_buffer[0])
-                # 判断发送缓冲区和 write_buffer 大小关系
+                # Compare send buffer and data
                 if len(data) <= self.sndbuff:
                     self.c_socket.send(data)
                     self.write_buffer.popleft()
@@ -62,8 +62,8 @@ class TCPStream(object):
         except BlockingIOError:
             # print("ViolaWriteBlockingIOError ignore it")
             pass
-        except (ConnectionResetError,
-                BrokenPipeError):
+        # Client exceptions
+        except (ConnectionResetError, BrokenPipeError):
             # print("ViolaWriteConnectionResetError, ViolaBrokenPipeError")
             self.release()
         except:
@@ -72,43 +72,31 @@ class TCPStream(object):
             raise
         finally:
             if self.keepalive:
-                # 数据没写完则不修改监听事件
+                # Do not change listen event if `write_buffer` not empty
                 if not self.write_buffer:
                     self.event_loop.update_handler(self.c_socket.fileno(),
                                                    EventLoop.READ)
-                if KeepAlive.not_exists(self.c_socket):
-                    # 若客户端出现异常, 则异常处理已经关闭了连接. 这里也就无需再 KeepAlive
+                if KeepAlive.not_exists(self):
+                    # Do not need KeepAlive if client exceptions hanppen
                     try:
-                        KeepAlive(self.c_socket, self.event_loop)
+                        KeepAlive(self, self.event_loop)
                     except OSError:
                         pass
             else:
-                # 若是大文件, 数据一般需要写多次, 则先不关闭连接
+                # Big size file
                 if not self.write_buffer:
                     self.release()
 
     def release(self):
-        self.event_loop.remove_handler(self.c_socket.fileno())
-        self.c_socket.close()
-
-    def read_from_buffer(self, read_buffer):
-        """
-        整理出完整的 GET 请求.
-        这个函数应该从该模块移除, 放到别处
-        """
-        # GET
-        delimiter = "\r\n\r\n"
-        if read_buffer:
-            str_rebuff = ""
-            for rb in self.read_buffer:
-                str_rebuff += rb.decode("utf8")
-            # 过滤 `split()` 后的 "" 字符串
-            [self.wrough_rebuff.append(x) for x in str_rebuff.split(delimiter)
-             if x.replace(" ", "")]
-        # POST
-        # TODO
+        try:
+            self.event_loop.remove_handler(self.c_socket.fileno())
+            self.c_socket.close()
+        except:
+            # print("release error.")
+            pass
 
     def _repair(self, data):
+        """Makesure type of data correct"""
         if isinstance(data, bytes):
             return data
         elif isinstance(data, str):
