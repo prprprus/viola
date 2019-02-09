@@ -50,5 +50,5 @@ class TCPServer(object):
     def handle_event(self, fd, event):
         raise NotImplementedError
 
-    def set_handler(self, req_handler):
-        self.req_handler = req_handler
+    def set_handler(self, wsgi_handler):
+        self.wsgi_handler = wsgi_handler

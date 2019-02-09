@@ -4,10 +4,10 @@ from viola.event_loop import EventLoop
 
 
 class WSGIStream(TCPStream):
-    def __init__(self, c_socket, event_loop, req_handler, env, start_response,
+    def __init__(self, c_socket, event_loop, wsgi_handler, env, start_response,
                  keepalive=False):
         super(WSGIStream, self).__init__(c_socket, event_loop, keepalive)
-        self.req_handler = req_handler
+        self.wsgi_handler = wsgi_handler
         self.env = env
         self.start_response = start_response
 
@@ -15,11 +15,11 @@ class WSGIStream(TCPStream):
         if event & EventLoop.READ:
             # print(1)
             self.handle_read()
-            # 将读写处理完毕的 stream 丢给 `req_handler()`
+            # 将读写处理完毕的 stream 丢给 `wsgi_handler()`
             if self.read_buffer or self.wrough_rebuff:
                 self.read_from_buffer(self.read_buffer)
                 # 暂时写死 wsgi handler
-                resp_data = self.req_handler(self.env, self.start_response)
+                resp_data = self.wsgi_handler(self.env, self.start_response)
                 [self.write_buffer.append(x) for x in resp_data]
                 # self.write_buffer.append(resp_data)
                 # 设置写感兴趣事件

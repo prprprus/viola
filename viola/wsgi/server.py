@@ -36,7 +36,7 @@ class WSGIServer(HTTPServer):
             print("accept error, close it")
             c_socket.close()
             raise
-        WSGIStream(c_socket, self.event_loop, self.req_handler, get_environ(),
+        WSGIStream(c_socket, self.event_loop, self.wsgi_handler, get_environ(),
                    self.start_response, keepalive=self.keepalive)
 
     def start_response(self, status, response_headers, exc_info=None):
