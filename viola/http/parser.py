@@ -4,6 +4,7 @@ from viola.exception import (
     ViolaHTTPVersionException
 )
 import sys
+import collections
 
 
 class Parser(object):
@@ -11,10 +12,10 @@ class Parser(object):
                    "PUT", "DELETE", "TRACE", "CONNECT"]
     HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
 
-    def __init__(self, http_req):
-        self.http_req = http_req
+    def __init__(self, read_buffer):
+        self.read_buffer = read_buffer
         self.headers = {}
-        self.env = {}
+        self.res = {}
 
     def parse_request(self):
         self._parse_headers()
@@ -22,11 +23,11 @@ class Parser(object):
         self._parse_mime_body()
         return {
             "headers": self.headers,
-            "env": self.env
+            "res": self.res
         }
 
     def _parse_headers(self):
-        req_cont = io.StringIO(self.http_req)
+        req_cont = io.StringIO(self.read_buffer[0])
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')
             if line:
@@ -39,7 +40,7 @@ class Parser(object):
                 else:
                     key, value = line.split(': ')
                     self.headers[key.strip()] = value.strip()
-        self.env["headers"] = self.headers
+        self.res["headers"] = self.headers
 
     def _parse_method(self, method):
         if method not in Parser.HTTP_METHOD:
@@ -67,19 +68,24 @@ class Parser(object):
     def _parse_mime_body(self):
         pass
 
-    @classmethod
-    def read_from_buffer(cls, read_buffer, wrough_rebuff):
-        """Split HTTP requests"""
+    def get_environ(self):
+        """Split HTTP requests and return environment variable"""
         # GET
         delimiter = "\r\n\r\n"
-        if read_buffer:
+        wrough_rebuff = collections.deque()
+        if self.read_buffer:
             str_rebuff = ""
-            for rb in read_buffer:
+            for rb in self.read_buffer:
                 str_rebuff += rb.decode("utf8")
             [wrough_rebuff.append(x) for x in str_rebuff.split(delimiter)
              if x.replace(" ", "")]
-        # POST
-        # TODO
+        self.read_buffer = wrough_rebuff
+
+        res = self.parse_request()
+        self.read_buffer.popleft()  # Consume
+
+        # TODO: POST
+        pass
 
         env = {}
         # Required WSGI variables
@@ -91,9 +97,9 @@ class Parser(object):
         env['wsgi.multiprocess'] = True
         env['wsgi.run_once']     = False
         # Required CGI variables
-        env['REQUEST_METHOD']    = "GET"    # GET
-        env['PATH_INFO']         = "/listNews"              # /hello
-        env['SERVER_NAME']       = "10.211.55.25"       # localhost
-        env['SERVER_PORT']       = "2333"  # 8888
+        env['REQUEST_METHOD']    = res["headers"]["method"]    # GET
+        env['PATH_INFO']         = res["headers"]["url"]              # /hello
+        env['SERVER_NAME'] = res["headers"]["Host"].split(":")[0] if ":" in res["headers"]["Host"] else res["headers"]["Host"]
+        env['SERVER_PORT'] = res["headers"]["Host"].split(":")[1] if ":" in res["headers"]["Host"] else "80"
 
         return env

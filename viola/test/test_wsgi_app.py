@@ -13,7 +13,7 @@ Server: viola
 """
 
 
-@app.route('/listNews')
+@app.route('/')
 def hello_world():
     # print(request.path)
     # print(request.method)

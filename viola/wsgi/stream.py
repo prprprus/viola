@@ -14,10 +14,9 @@ class WSGIStream(TCPStream):
     def handle_event(self, fd, event):
         if event & EventLoop.READ:
             self.read_from_socket()
-            if self.read_buffer or self.wrough_rebuff:
+            if self.read_buffer:
                 # Prase request
-                env = Parser.read_from_buffer(self.read_buffer,
-                                              self.wrough_rebuff)
+                env = Parser(self.read_buffer).get_environ()
                 # Run wsgi handler
                 resp_data = self.wsgi_handler(env, self.start_response)
                 # Wrapper response
@@ -26,8 +25,6 @@ class WSGIStream(TCPStream):
                 [self.write_buffer.append(x) for x in resp_data]
                 self.event_loop.update_handler(self.c_socket.fileno(),
                                                EventLoop.WRITE)
-                # Consume
-                self.wrough_rebuff.popleft()
             # Prevent event of read hunger
             else:
                 self.release()

@@ -13,7 +13,6 @@ class TCPStream(object):
         self.event_loop = event_loop
         self.keepalive = keepalive
         self.read_buffer = collections.deque()
-        self.wrough_rebuff = collections.deque()
         self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
