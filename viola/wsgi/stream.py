@@ -23,7 +23,6 @@ class WSGIStream(TCPStream):
                 # Wrapper response
                 [self.write_buffer.append(Wrapper(x, env).get_resp())
                  for x in resp_data]
-                # [self.write_buffer.append(x) for x in resp_data]
                 # Change listen event to write
                 self.event_loop.update_handler(self.c_socket.fileno(),
                                                EventLoop.WRITE)

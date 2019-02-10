@@ -2,6 +2,7 @@ from viola.event_loop import EventLoop
 from viola.wsgi.server import WSGIServer
 from viola.scheduler import Scheduler
 from viola.test.test_wsgi_app import app
+# import os
 
 
 if __name__ == '__main__':

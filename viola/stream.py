@@ -33,8 +33,7 @@ class TCPStream(object):
                 if len(chunk) > 0:
                     self.read_buffer.append(chunk)
                 else:
-                    # Exit the loop if chunk equal `''`
-                    break
+                    break    # Exit the loop if chunk equal `''`
         except BlockingIOError:
             # print("ViolaReadBlockingIOError ignore it")
             pass
@@ -43,7 +42,7 @@ class TCPStream(object):
             # print("ViolaReadConnectionResetError")
             self.release()
         except:
-            # print("c_socket recv error, close it")
+            # print("`handle_read()` error, close it")
             self.release()
             raise
 

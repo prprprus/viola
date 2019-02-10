@@ -1,5 +1,6 @@
 from flask import Flask
 # from flask import request
+import json
 
 
 app = Flask(__name__)
@@ -24,4 +25,6 @@ resp_data = """
 def hello_world():
     # print(request.path)
     # print(request.method)
-    return resp_data
+    # return resp_data
+    result = {"name": "tiger", "age": 28, "sex": "male"}
+    return json.dumps(result)
