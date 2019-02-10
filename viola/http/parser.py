@@ -97,9 +97,9 @@ class Parser(object):
         env['wsgi.multiprocess'] = True
         env['wsgi.run_once']     = False
         # Required CGI variables
-        env['REQUEST_METHOD']    = res["headers"]["method"]    # GET
-        env['PATH_INFO']         = res["headers"]["url"]              # /hello
-        env['SERVER_NAME'] = res["headers"]["Host"].split(":")[0] if ":" in res["headers"]["Host"] else res["headers"]["Host"]
-        env['SERVER_PORT'] = res["headers"]["Host"].split(":")[1] if ":" in res["headers"]["Host"] else "80"
+        env['REQUEST_METHOD']    = res["headers"]["method"]
+        env['PATH_INFO']         = res["headers"]["url"]
+        env['SERVER_NAME']       = res["headers"]["Host"].split(":")[0] if ":" in res["headers"]["Host"] else res["headers"]["Host"]
+        env['SERVER_PORT']       = res["headers"]["Host"].split(":")[1] if ":" in res["headers"]["Host"] else "80"
 
         return env
