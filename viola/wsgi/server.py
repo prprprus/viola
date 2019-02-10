@@ -9,6 +9,7 @@ class WSGIServer(TCPServer):
     def handle_event(self, fd, event):
         try:
             c_socket, address = self.s_socket.accept()
+            self.c_socket = c_socket
         except:
             print("accept error, close it")
             c_socket.close()
@@ -18,8 +19,14 @@ class WSGIServer(TCPServer):
                    self.start_response, keepalive=self.keepalive)
 
     def start_response(self, status, response_headers, exc_info=None):
-        server_headers = [
-            ('Server', 'viola 0.26'),
-        ]
-        self.headers_set = [status, response_headers + server_headers]
-        # pass
+        # server_headers = [
+        #     ('Server', 'viola 0.26'),
+        # ]
+        # self.headers_set = [status, response_headers + server_headers]
+        # print('+++++++++++')
+        # print(status)
+        # print(response_headers)
+        # print(exc_info)
+        # print(self.headers_set)
+        # print('+++++++++++')
+        pass

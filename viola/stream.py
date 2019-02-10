@@ -26,7 +26,7 @@ class TCPStream(object):
     def handle_event(self, fd, event):
         raise NotImplementedError
 
-    def read_from_socket(self):
+    def handle_read(self):
         try:
             while True:
                 chunk = self.c_socket.recv(self.chunk_size)
@@ -47,7 +47,7 @@ class TCPStream(object):
             self.release()
             raise
 
-    def write_to_socket(self):
+    def handle_write(self):
         try:
             while self.write_buffer:
                 data = self._repair(self.write_buffer[0])

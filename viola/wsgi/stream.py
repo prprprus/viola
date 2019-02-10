@@ -2,6 +2,7 @@ from viola.stream import TCPStream
 from viola.exception import ViolaEventException
 from viola.event_loop import EventLoop
 from viola.http.parser import Parser
+from viola.http.wrapper import Wrapper
 
 
 class WSGIStream(TCPStream):
@@ -13,23 +14,24 @@ class WSGIStream(TCPStream):
 
     def handle_event(self, fd, event):
         if event & EventLoop.READ:
-            self.read_from_socket()
+            self.handle_read()
             if self.read_buffer:
-                # Prase request
+                # Parse request
                 env = Parser(self.read_buffer).get_environ()
                 # Run wsgi handler
                 resp_data = self.wsgi_handler(env, self.start_response)
                 # Wrapper response
-                pass
+                [self.write_buffer.append(Wrapper(x, env).get_resp())
+                 for x in resp_data]
+                # [self.write_buffer.append(x) for x in resp_data]
                 # Change listen event to write
-                [self.write_buffer.append(x) for x in resp_data]
                 self.event_loop.update_handler(self.c_socket.fileno(),
                                                EventLoop.WRITE)
             # Prevent event of read hunger
             else:
                 self.release()
         elif event & EventLoop.WRITE:
-            self.write_to_socket()
+            self.handle_write()
         elif event & EventLoop.ERROR:
             # print("epoll error, close it")
             self.release()

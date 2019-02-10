@@ -5,10 +5,17 @@ from flask import Flask
 app = Flask(__name__)
 
 
-resp_data = b"""
-HTTP/1.1 200 OK
-Server: viola
+# resp_data = b"""
+# HTTP/1.1 200 OK
+# Server: viola
+# Accept-Ranges: bytes
+# Content-Lenght: 11
+# Content-Type: text/html
 
+# <h1>ok</h1>
+# """
+
+resp_data = """
 <h1>ok</h1>
 """
 
