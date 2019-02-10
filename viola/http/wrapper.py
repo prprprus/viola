@@ -8,7 +8,7 @@ class Wrapper(object):
         return """
 HTTP/1.1 200 OK
 Server: viola
-Content-Type: application/json
+Content-Type: text/html
 
 {}
 """.format(self.data)
