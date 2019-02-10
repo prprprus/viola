@@ -48,7 +48,7 @@ class Parser(object):
         self.headers["method"] = method
 
     def _parse_arguments(self, url):
-        # HTTP GET arguments convert to dict
+        """HTTP GET arguments convert to dict"""
         if '?' not in url:
             self.headers["url"] = url
         else:
@@ -81,14 +81,13 @@ class Parser(object):
              if x.replace(" ", "")]
         self.read_buffer = wrough_rebuff
 
-        res = self.parse_request()
+        res = self.parse_request()  # Parse HTTP request
         self.read_buffer.popleft()  # Consume
 
-        # TODO: POST
-        pass
+        # POST: TODO
 
+        # WSGI environ Variables(Required)
         env = {}
-        # Required WSGI variables
         env['wsgi.version']      = (1, 0)
         env['wsgi.url_scheme']   = 'http'
         env['wsgi.input']        = b""
@@ -96,7 +95,6 @@ class Parser(object):
         env['wsgi.multithread']  = True
         env['wsgi.multiprocess'] = True
         env['wsgi.run_once']     = False
-        # Required CGI variables
         env['REQUEST_METHOD']    = res["headers"]["method"]
         env['PATH_INFO']         = res["headers"]["url"]
         env['SERVER_NAME']       = res["headers"]["Host"].split(":")[0] if ":" in res["headers"]["Host"] else res["headers"]["Host"]
