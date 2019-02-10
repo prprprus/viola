@@ -3,6 +3,7 @@ from viola.exception import (
     ViolaHTTPMethodException,
     ViolaHTTPVersionException
 )
+import sys
 
 
 class Parser(object):
@@ -80,23 +81,19 @@ class Parser(object):
         # POST
         # TODO
 
-        import sys
         env = {}
-        # The following code snippet does not follow PEP8 conventions
-        # but it's formatted the way it is for demonstration purposes
-        # to emphasize the required variables and their values
-        #
         # Required WSGI variables
-        env['wsgi.version']      = (1, 1)
+        env['wsgi.version']      = (1, 0)
         env['wsgi.url_scheme']   = 'http'
-        env['wsgi.input']        = b"hello world"
+        env['wsgi.input']        = b""
         env['wsgi.errors']       = sys.stderr
-        env['wsgi.multithread']  = False
-        env['wsgi.multiprocess'] = False
+        env['wsgi.multithread']  = True
+        env['wsgi.multiprocess'] = True
         env['wsgi.run_once']     = False
         # Required CGI variables
         env['REQUEST_METHOD']    = "GET"    # GET
         env['PATH_INFO']         = "/listNews"              # /hello
         env['SERVER_NAME']       = "10.211.55.25"       # localhost
         env['SERVER_PORT']       = "2333"  # 8888
+
         return env

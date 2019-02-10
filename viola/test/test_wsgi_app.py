@@ -10,7 +10,7 @@ resp_data = b"""
 HTTP/1.1 200 OK
 Server: viola
 
-ok
+<h1>ok</h1>
 """
 
 
