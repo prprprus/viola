@@ -22,3 +22,4 @@ class WSGIServer(TCPServer):
             ('Server', 'viola 0.26'),
         ]
         self.headers_set = [status, response_headers + server_headers]
+        # pass
