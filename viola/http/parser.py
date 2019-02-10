@@ -80,7 +80,6 @@ class Parser(object):
             [wrough_rebuff.append(x) for x in str_rebuff.split(delimiter)
              if x.replace(" ", "")]
         self.read_buffer = wrough_rebuff
-
         res = self.parse_request()  # Parse HTTP request
         self.read_buffer.popleft()  # Consume
 
