@@ -87,7 +87,7 @@ class Parser(object):
         # to emphasize the required variables and their values
         #
         # Required WSGI variables
-        env['wsgi.version']      = (1, 0)
+        env['wsgi.version']      = (1, 1)
         env['wsgi.url_scheme']   = 'http'
         env['wsgi.input']        = b"hello world"
         env['wsgi.errors']       = sys.stderr

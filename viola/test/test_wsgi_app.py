@@ -8,8 +8,9 @@ app = Flask(__name__)
 
 resp_data = b"""
 HTTP/1.1 200 OK
+Server: viola
 
-{"result": "ok"}
+ok
 """
 
 

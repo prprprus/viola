@@ -43,3 +43,5 @@ Hi guys, viola is a epoll-based event loop http server.
         ```
     - 大数据量
         pass
+- 加了 Nginx
+    - siege -b -t60S -c1000 http://10.211.55.25
