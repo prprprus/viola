@@ -8,8 +8,15 @@ import collections
 
 
 class Parser(object):
-    HTTP_METHOD = ["OPTIONS", "GET", "HEAD", "POST",
-                   "PUT", "DELETE", "TRACE", "CONNECT"]
+    HTTP_METHOD = [
+        "OPTIONS",
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "TRACE",
+        "CONNECT"]
     HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
 
     def __init__(self, read_buffer):
