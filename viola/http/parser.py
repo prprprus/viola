@@ -17,7 +17,9 @@ class Parser(object):
         "DELETE",
         "TRACE",
         "CONNECT"]
-    HTTP_VERSION = ["HTTP/1.1", "HTTP/1.0"]
+    HTTP_VERSION = [
+        "HTTP/1.1",
+        "HTTP/1.0"]
 
     def __init__(self, read_buffer):
         self.read_buffer = read_buffer
