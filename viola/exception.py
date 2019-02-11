@@ -1,3 +1,6 @@
+"""Custom exception for viola"""
+
+
 class ViolaEventException(Exception):
     """Event does not exists"""
     pass

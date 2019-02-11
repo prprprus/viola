@@ -1,10 +1,9 @@
-"""A epoll-based event loop. Use LT trigger mode"""
 from viola.epoll import Epoll
 import time
-from viola.exception import ViolaEventException
 
 
 class EventLoop(object):
+    """A epoll-based event loop. Use LT trigger mode"""
     READ = Epoll.READ
     WRITE = Epoll.WRITE
     ERROR = Epoll.ERROR
@@ -25,11 +24,9 @@ class EventLoop(object):
 
     def add_handler(self, fd, events, handler):
         """
-        Register listen fd to epoll and add handler.
-        Additional EventLoop.ERROR for events
+        Register listen fd to epoll and add handler to fd.
+        Additional EventLoop.ERROR for events.
         """
-        if not events:
-            raise ViolaEventException
         self.epoll.register(fd, events | EventLoop.ERROR)
         self.handlers[fd] = handler
 
@@ -40,11 +37,10 @@ class EventLoop(object):
 
     def update_handler(self, fd, events):
         """Update interested event for fd"""
-        if not events:
-            raise ViolaEventException
         self.epoll.modify(fd, events | EventLoop.ERROR)
 
     def start(self):
+        """Start event loop"""
         if self._stop:
             self._stop = False
             return
@@ -53,32 +49,34 @@ class EventLoop(object):
         while True:
             poll_timeout = 0.2
 
-            # Add callback task
+            # Run callback task: TODO
             pass
 
             # Run scheduler task
             now = time.time()
             while self.scheduler.tasks and \
                     (self.scheduler.tasks[0].deadline <= now):
-                self.scheduler.tasks[0].callback()  # Add try-catch
+                self.scheduler.tasks[0].callback()  # TODO: Add try-catch
                 self.scheduler.tasks.popleft()
-            # Priority run task if interval less than `timeout`
             if self.scheduler.tasks:
                 interval = self.scheduler.tasks[0].deadline - now
+                # Priority to run task if interval less than epoll timeout
+                # because you need to make task as punctual as possible.
                 poll_timeout = min(interval, poll_timeout)
 
-            # If run `stop()` somewhere, exit the event loop
+            # If stop event loop in somewhere, exit the event loop
             if not self._running:
                 break
 
-            # Start event loop
-            events = self.epoll.poll(poll_timeout)
+            events = self.epoll.poll(poll_timeout)  # Equivalent of epoll_wait
             for fd, event in events:
-                self.handlers[fd](fd, event)    # Event already and run callback
+                self.handlers[fd](fd, event)    # event already and run handler of fd
 
     def stop(self):
+        """Stop event loop"""
         self._stop = True
         self._running = False
 
     def get_status(self):
+        """Get event loop status"""
         return "running" if self._running else "stopped"

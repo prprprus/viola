@@ -1,6 +1,5 @@
 import collections
 from viola.event_loop import EventLoop
-from viola.http.keepalive import KeepAlive
 import socket
 from viola.exception import ViolaSendDataTypeException
 import logging
@@ -17,8 +16,10 @@ class TCPStream(object):
         self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
+
         self.event_loop.add_handler(self.c_socket.fileno(), EventLoop.READ,
                                     self.handle_event)
+
         self.sndbuff = self.c_socket.getsockopt(socket.SOL_SOCKET,
                                                 socket.SO_SNDBUF)
         self.revbuff = self.c_socket.getsockopt(socket.SOL_SOCKET,
@@ -50,8 +51,7 @@ class TCPStream(object):
         try:
             while self.write_buffer:
                 data = self._repair(self.write_buffer[0])
-                # Compare send buffer and data
-                if len(data) <= self.sndbuff:
+                if len(data) <= self.sndbuff:   # Compare send buffer and data
                     self.c_socket.send(data)
                     self.write_buffer.popleft()
                 else:
@@ -60,7 +60,6 @@ class TCPStream(object):
         except BlockingIOError:
             logging.debug("BlockingIOError, ignore it")
             pass
-        # Client exceptions
         except (ConnectionResetError, BrokenPipeError):
             logging.debug("Client exceptions")
             self.release()
@@ -69,21 +68,8 @@ class TCPStream(object):
             self.release()
             raise
         finally:
-            if self.keepalive:
-                # Do not change listen event if `write_buffer` not empty
-                if not self.write_buffer:
-                    self.event_loop.update_handler(self.c_socket.fileno(),
-                                                   EventLoop.READ)
-                if KeepAlive.not_exists(self):
-                    # Do not need KeepAlive if client exceptions hanppen
-                    try:
-                        KeepAlive(self, self.event_loop)
-                    except OSError:
-                        pass
-            else:
-                # Big size file
-                if not self.write_buffer:
-                    self.release()
+            if not self.write_buffer:   # Big size
+                self.release()
 
     def release(self):
         try:
@@ -94,7 +80,7 @@ class TCPStream(object):
             pass
 
     def _repair(self, data):
-        """Makesure type of data correct"""
+        """Makesure type of response correct"""
         if isinstance(data, bytes):
             return data
         elif isinstance(data, str):

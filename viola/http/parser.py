@@ -79,7 +79,7 @@ class Parser(object):
 
     def get_environ(self):
         """Split HTTP requests and return environment variable"""
-        # GET
+        # Parse GET method
         delimiter = "\r\n\r\n"
         wrough_rebuff = collections.deque()
         if self.read_buffer:
@@ -92,7 +92,7 @@ class Parser(object):
         res = self.parse_request()  # Parse HTTP request
         self.read_buffer.popleft()  # Consume
 
-        # POST: TODO
+        # Parse POST method: TODO
 
         # WSGI environ Variables(Required)
         env = {}

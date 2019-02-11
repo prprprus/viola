@@ -1,4 +1,4 @@
-Hi guys, viola is a epoll-based event loop http server.
+viola is a WSGI server that Single-threaded, non-blocking I/O based on event-driven model and has no dependencies other than the Python Standard Library. Usually used with Nginx.
 
 # httpserver.py
 1. 建立服务端 socket

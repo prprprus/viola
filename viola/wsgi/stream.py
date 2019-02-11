@@ -14,6 +14,7 @@ class WSGIStream(TCPStream):
         self.start_response = start_response
 
     def handle_event(self, fd, event):
+        """Handle already event for connection socket"""
         if event & EventLoop.READ:
             self.handle_read()
             if self.read_buffer:
@@ -27,9 +28,6 @@ class WSGIStream(TCPStream):
                 # Change listen event to write
                 self.event_loop.update_handler(self.c_socket.fileno(),
                                                EventLoop.WRITE)
-            # Prevent event of read hunger
-            else:
-                self.release()
         elif event & EventLoop.WRITE:
             self.handle_write()
         elif event & EventLoop.ERROR:

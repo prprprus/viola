@@ -5,7 +5,7 @@ import logging
 try:
     poll = select.epoll
 except ImportError:
-    logging.warning("epoll module not found")
+    logging.error("Your system does not support epoll")
     raise
 
 
@@ -22,13 +22,13 @@ class Epoll(object):
         return self.epfd.fileno()
 
     def register(self, fd, events):
-        self.epfd.register(fd, events)  # EPOLL_CTL_ADD
+        self.epfd.register(fd, events)  # epoll_ctl_add
 
     def unregister(self, fd):
-        self.epfd.unregister(fd)    # EPOLL_CTL_DEL
+        self.epfd.unregister(fd)    # epoll_ctl_del
 
     def modify(self, fd, events):
-        self.epfd.modify(fd, events)    # EPOLL_CTL_MOD
+        self.epfd.modify(fd, events)    # epoll_ctl_mod
 
     def poll(self, timeout=-1):
         return self.epfd.poll(timeout)  # epoll_wait
