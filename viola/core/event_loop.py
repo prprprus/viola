@@ -1,4 +1,4 @@
-from viola.epoll import Epoll
+from viola.core.epoll import Epoll
 import time
 
 

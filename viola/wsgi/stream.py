@@ -1,6 +1,6 @@
-from viola.stream import TCPStream
+from viola.core.stream import TCPStream
 from viola.exception import ViolaEventException
-from viola.event_loop import EventLoop
+from viola.core.event_loop import EventLoop
 from viola.http.parser import Parser
 from viola.http.wrapper import Wrapper
 import logging

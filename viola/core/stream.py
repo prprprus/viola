@@ -1,5 +1,5 @@
 import collections
-from viola.event_loop import EventLoop
+from viola.core.event_loop import EventLoop
 import socket
 from viola.exception import ViolaSendDataTypeException
 import logging

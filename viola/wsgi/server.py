@@ -1,4 +1,4 @@
-from viola.server import TCPServer
+from viola.core.server import TCPServer
 from viola.wsgi.stream import WSGIStream
 
 

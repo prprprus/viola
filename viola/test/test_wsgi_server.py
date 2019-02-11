@@ -1,6 +1,6 @@
-from viola.event_loop import EventLoop
+from viola.core.event_loop import EventLoop
 from viola.wsgi.server import WSGIServer
-from viola.scheduler import Scheduler
+from viola.core.scheduler import Scheduler
 # from viola.test.test_wsgi_flask import app
 from viola.test.test_wsgi_bottle import app
 # import os
