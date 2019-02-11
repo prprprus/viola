@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 # from flask import request
 import json
 
@@ -26,5 +26,5 @@ def hello_world():
     # print(request.path)
     # print(request.method)
     # return resp_data
-    result = {"name": "tiger", "age": 28, "sex": "male"}
-    return json.dumps(result)
+    # return json.dumps({"name": "tiger", "age": 28, "sex": "male"})
+    return render_template("hello.tpl", name="tiger")

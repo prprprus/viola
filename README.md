@@ -45,3 +45,8 @@ Hi guys, viola is a epoll-based event loop http server.
         pass
 - 加了 Nginx
     - siege -b -t60S -c1000 http://10.211.55.25
+
+
+# 总结
+1、Web框架会极大影响性能
+2、Nginx 的 proxy_pass 只有在应用服务器返回正确的 HTTP 响应格式时, 才会自动添加响应头

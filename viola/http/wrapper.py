@@ -4,11 +4,12 @@ class Wrapper(object):
         self.env = env
 
     def get_resp(self):
-        # 200
-        return """
-HTTP/1.1 200 OK
-Server: viola
-Content-Type: text/html
+        # Note: Nginx add additional response headers if and only if
+        # format of response accord with HTTP protocol
 
-{}
-""".format(self.data)
+        # 200
+        return "HTTP/1.1 200 OK\r\nContent-Length: {0}\r\n\r\n{1}" \
+            .format(len(self.data), self.data)
+
+        # 500
+        pass
