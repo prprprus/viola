@@ -18,7 +18,7 @@ class KeepAlive(object):
         self.event_loop = event_loop
         self.timeout = timeout
         self.max_count = max_count
-        # Makesure `TCP_KEEPALIVE` arguments open
+        # Makesure TCP keepalive option open
         tcp_keepalive = self.stream.c_socket.getsockopt(socket.SOL_SOCKET,
                                                         socket.SO_KEEPALIVE)
         if tcp_keepalive == 0:

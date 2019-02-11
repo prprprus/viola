@@ -9,5 +9,5 @@ class Wrapper(object):
         # 200
         return "HTTP/1.1 200 OK\r\nContent-Length: {0}\r\n\r\n{1}" \
             .format(len(self.data), self.data)
-        # 500
+        # 500: TODO
         pass

@@ -12,7 +12,7 @@ class Scheduler(object):
         return cls._instance
 
     def __init__(self):
-        self.tasks = deque()    # Orderly queue
+        self.tasks = deque()
         self.running = False
 
     def add_task(self, deadline, callback):
@@ -23,7 +23,6 @@ class Scheduler(object):
 
     def cancel_task(self):
         """Cancel scheduler: TODO"""
-        # self.running = False
         pass
 
 
