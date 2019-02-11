@@ -3,6 +3,7 @@ from viola.exception import ViolaEventException
 from viola.event_loop import EventLoop
 from viola.http.parser import Parser
 from viola.http.wrapper import Wrapper
+import logging
 
 
 class WSGIStream(TCPStream):
@@ -32,7 +33,7 @@ class WSGIStream(TCPStream):
         elif event & EventLoop.WRITE:
             self.handle_write()
         elif event & EventLoop.ERROR:
-            # print("epoll error, close it")
+            logging.error("class WSGIStream handle_event error, close it")
             self.release()
             raise
         else:

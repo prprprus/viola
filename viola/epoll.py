@@ -1,10 +1,11 @@
 import select
+import logging
 
 
 try:
     poll = select.epoll
 except ImportError:
-    # logging.warning("epoll module not found")
+    logging.warning("epoll module not found")
     raise
 
 

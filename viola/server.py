@@ -2,6 +2,7 @@ import socket
 from viola.event_loop import EventLoop
 import fcntl
 import os
+import logging
 
 
 class TCPServer(object):
@@ -34,10 +35,10 @@ class TCPServer(object):
                     self.event_loop.add_handler(self.s_socket.fileno(),
                                                 EventLoop.READ,
                                                 self.handle_event)
-                    # print("Subprocess: ", id(self.event_loop.epoll))
+                    logging.debug("Subprocess: ", id(self.event_loop.epoll))
                     return
                 else:
-                    # print("Parentprocess: ", id(self.event_loop.epoll))
+                    logging.debug("Parentprocess: ", id(self.event_loop.epoll))
                     os.waitpid(-1, 0)
         else:
             self.event_loop.add_handler(self.s_socket.fileno(), EventLoop.READ,

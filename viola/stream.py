@@ -3,6 +3,7 @@ from viola.event_loop import EventLoop
 from viola.http.keepalive import KeepAlive
 import socket
 from viola.exception import ViolaSendDataTypeException
+import logging
 
 
 class TCPStream(object):
@@ -35,14 +36,13 @@ class TCPStream(object):
                 else:
                     break    # Exit the loop if chunk equal `''`
         except BlockingIOError:
-            # print("ViolaReadBlockingIOError ignore it")
+            logging.debug("BlockingIOError, ignore it")
             pass
-        # Client exceptions
         except (ConnectionResetError, BrokenPipeError):
-            # print("ViolaReadConnectionResetError")
+            logging.debug("Client exceptions")
             self.release()
         except:
-            # print("`handle_read()` error, close it")
+            logging.error("`handle_read()` error, close it")
             self.release()
             raise
 
@@ -58,14 +58,14 @@ class TCPStream(object):
                     size = self.c_socket.send(data)
                     self.write_buffer[0] = self.write_buffer[0][size:]
         except BlockingIOError:
-            # print("ViolaWriteBlockingIOError ignore it")
+            logging.debug("BlockingIOError, ignore it")
             pass
         # Client exceptions
         except (ConnectionResetError, BrokenPipeError):
-            # print("ViolaWriteConnectionResetError, ViolaBrokenPipeError")
+            logging.debug("Client exceptions")
             self.release()
         except:
-            # print("c_socket send error, close it")
+            logging.error("handle_write error, close it")
             self.release()
             raise
         finally:
@@ -90,7 +90,7 @@ class TCPStream(object):
             self.event_loop.remove_handler(self.c_socket.fileno())
             self.c_socket.close()
         except:
-            # print("release error.")
+            logging.error("release error.")
             pass
 
     def _repair(self, data):
