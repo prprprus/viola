@@ -7,9 +7,8 @@ import logging
 
 
 class WSGIStream(TCPStream):
-    def __init__(self, c_socket, event_loop, wsgi_handler, start_response,
-                 keepalive=False):
-        super(WSGIStream, self).__init__(c_socket, event_loop, keepalive)
+    def __init__(self, c_socket, event_loop, wsgi_handler, start_response):
+        super(WSGIStream, self).__init__(c_socket, event_loop)
         self.wsgi_handler = wsgi_handler
         self.start_response = start_response
 

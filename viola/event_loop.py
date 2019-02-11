@@ -3,7 +3,7 @@ import time
 
 
 class EventLoop(object):
-    """A epoll-based event loop. Use LT trigger mode"""
+    """A epoll-based event loop. Use LT mode of epoll"""
     READ = Epoll.READ
     WRITE = Epoll.WRITE
     ERROR = Epoll.ERROR
@@ -68,9 +68,9 @@ class EventLoop(object):
             if not self._running:
                 break
 
-            events = self.epoll.poll(poll_timeout)  # Equivalent of epoll_wait
+            events = self.epoll.poll(poll_timeout)  # epoll_wait
             for fd, event in events:
-                self.handlers[fd](fd, event)    # event already and run handler of fd
+                self.handlers[fd](fd, event)
 
     def stop(self):
         """Stop event loop"""

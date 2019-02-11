@@ -4,7 +4,7 @@ from collections import deque
 
 
 class Scheduler(object):
-
+    """"A timer based on EventLoop class"""
     @classmethod
     def instance(cls):
         if not hasattr(cls, "_instance"):
@@ -16,12 +16,15 @@ class Scheduler(object):
         self.running = False
 
     def add_task(self, deadline, callback):
+        """Add task into queue. Tasks are orderly"""
         task = Task(deadline, callback)
         bisect.insort(self.tasks, task)
         self.running = True
 
-    def cancel(self):
-        self.running = False
+    def cancel_task(self):
+        """Cancel scheduler: TODO"""
+        # self.running = False
+        pass
 
 
 class Task(object):

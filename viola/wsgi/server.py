@@ -3,8 +3,8 @@ from viola.wsgi.stream import WSGIStream
 
 
 class WSGIServer(TCPServer):
-    def __init__(self, event_loop, keepalive=False):
-        super(WSGIServer, self).__init__(event_loop, keepalive)
+    def __init__(self, event_loop):
+        super(WSGIServer, self).__init__(event_loop)
 
     def handle_event(self, fd, event):
         try:
@@ -15,8 +15,7 @@ class WSGIServer(TCPServer):
             c_socket.close()
             raise
 
-        WSGIStream(c_socket, self.event_loop, self.wsgi_handler,
-                   self.start_response, keepalive=self.keepalive)
+        WSGIStream(c_socket, self.event_loop, self.wsgi_app, self.start_response)
 
     def start_response(self, status, response_headers, exc_info=None):
         pass

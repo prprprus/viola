@@ -6,12 +6,12 @@ import logging
 
 
 class TCPStream(object):
-    def __init__(self, c_socket, event_loop, keepalive,
-                 max_buffer_size=104857600, chunk_size=4096):
+    """Wrapper connection socket and register to event loop"""
+    def __init__(self, c_socket, event_loop, max_buffer_size=104857600,
+                 chunk_size=4096):
         self.c_socket = c_socket
         self.c_socket.setblocking(0)
         self.event_loop = event_loop
-        self.keepalive = keepalive
         self.read_buffer = collections.deque()
         self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
@@ -26,9 +26,11 @@ class TCPStream(object):
                                                 socket.SO_RCVBUF)
 
     def handle_event(self, fd, event):
+        """Left to the upper server implementation"""
         raise NotImplementedError
 
     def handle_read(self):
+        """Read until TCP receive buffer empty or encounter exception"""
         try:
             while True:
                 chunk = self.c_socket.recv(self.chunk_size)
@@ -48,6 +50,9 @@ class TCPStream(object):
             raise
 
     def handle_write(self):
+        """
+        Write until pending buffer(`write_buffer`) empty or encounter exception
+        """
         try:
             while self.write_buffer:
                 data = self._repair(self.write_buffer[0])
@@ -68,10 +73,11 @@ class TCPStream(object):
             self.release()
             raise
         finally:
-            if not self.write_buffer:   # Big size
+            if not self.write_buffer:   # Big size file
                 self.release()
 
     def release(self):
+        """Release connection socket related resources"""
         try:
             self.event_loop.remove_handler(self.c_socket.fileno())
             self.c_socket.close()
@@ -80,7 +86,7 @@ class TCPStream(object):
             pass
 
     def _repair(self, data):
-        """Makesure type of response correct"""
+        """Makesure correct for type of response data"""
         if isinstance(data, bytes):
             return data
         elif isinstance(data, str):
