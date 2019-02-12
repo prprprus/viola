@@ -77,10 +77,10 @@ That's all.
 
 ## TODO
 
-+ [] Improved WSGI protocol
-+ [] Millisecond timer
-+ [] HTTP POST method and more
-+ [] Improved response module
++ [ ] Improved WSGI protocol
++ [ ] Millisecond timer
++ [ ] HTTP POST method and more
++ [ ] Improved response module
 
 ### Resources
 
