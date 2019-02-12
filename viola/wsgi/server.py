@@ -1,5 +1,6 @@
 from viola.core.server import TCPServer
 from viola.wsgi.stream import WSGIStream
+import logging
 
 
 class WSGIServer(TCPServer):
@@ -11,10 +12,9 @@ class WSGIServer(TCPServer):
             c_socket, address = self.s_socket.accept()
             self.c_socket = c_socket
         except:
-            print("accept error, close it")
+            logging.debug("WSGIServer class handle_event error, close it")
             c_socket.close()
             raise
-
         WSGIStream(c_socket, self.event_loop, self.wsgi_app, self.start_response)
 
     def start_response(self, status, response_headers, exc_info=None):

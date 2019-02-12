@@ -78,7 +78,9 @@ class Parser(object):
         pass
 
     def get_environ(self):
-        """Split HTTP requests and return environment variable"""
+        """
+        Split HTTP requests and return environment variable for WSGI application
+        """
         # Parse GET method
         delimiter = "\r\n\r\n"
         wrough_rebuff = collections.deque()
@@ -93,6 +95,7 @@ class Parser(object):
         self.read_buffer.popleft()  # Consume
 
         # Parse POST method: TODO
+        pass
 
         # WSGI environ Variables(Required)
         env = {}
