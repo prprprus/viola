@@ -1,6 +1,6 @@
 # viola
 
-[![build status](https://travis-ci.org/prprprus/viola.svg?branch=master)]
+[![build status](https://travis-ci.org/prprprus/viola.svg?branch=master)](https://travis-ci.org/prprprus/viola.svg?branch=master)
 
 viola is a WSGI server. Single-thread, non-blocking I/O based on event-driven model and has no dependencies other than the Python Standard Library. Usually used with Nginx.
 
