@@ -37,7 +37,7 @@ class TCPStream(object):
                 if len(chunk) > 0:
                     self.read_buffer.append(chunk)
                 else:
-                    break    # Exit the loop if chunk equal `''`
+                    break    # Exit the loop if chunk equal ''
         except BlockingIOError:
             logging.debug("BlockingIOError, ignore it")
             pass
