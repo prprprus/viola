@@ -1,3 +1,4 @@
+"""Not yet used for this module"""
 import socket
 import weakref
 
