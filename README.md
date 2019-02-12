@@ -1,4 +1,6 @@
-viola is a WSGI server that Single-threaded, non-blocking I/O based on event-driven model and has no dependencies other than the Python Standard Library. Usually used with Nginx.
+# viola
+
+viola is a WSGI server. Single-thread, non-blocking I/O based on event-driven model and has no dependencies other than the Python Standard Library. Usually used with Nginx.
 
 # httpserver.py
 1. 建立服务端 socket
