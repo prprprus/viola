@@ -4,7 +4,7 @@
 
 [中文](https://github.com/prprprus/viola/blob/master/README_CN.md)
 
-viola is a WSGI server. Lightweight and efficient and has no dependencies other than the Python Standard Library. Usually used with Nginx.
+viola is a WSGI server. Lightweight and efficient and has no dependencies other than the Python Standard Library. Usually used with Nginx. I build [blog](http://hentaiuih.us/) with viola, handle static resource by Nginx and dynamic content with viola. You can also do this or using viola as a reference for learn networking programming.
 
 Table of content:
 
