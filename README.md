@@ -6,15 +6,15 @@ viola is a WSGI server. Lightweight and efficient and has no dependencies other 
 
 Table of content
 
-- Features
-- Requirements
-- Installation
-- Example
-- Performance
-- TODO
-- Resources
-- License
-- Contributing
+- [Features](https://github.com/prprprus/viola#features)
+- [Requirements](https://github.com/prprprus/viola#requirements)
+- [Installation](https://github.com/prprprus/viola#installation)
+- [Example](https://github.com/prprprus/viola#example)
+- [Performance](https://github.com/prprprus/viola#performance)
+- [TODO](https://github.com/prprprus/viola#todo)
+- [Resources](https://github.com/prprprus/viola#resources)
+- [License](https://github.com/prprprus/viola#license)
+- [Contributing](https://github.com/prprprus/viola#contributing)
 
 ## Features
 
