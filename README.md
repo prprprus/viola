@@ -4,7 +4,7 @@
 
 [中文](https://github.com/prprprus/viola/blob/master/README_CN.md)
 
-viola is a WSGI server. Lightweight and efficient and has no dependencies other than the [Python Standard Library](https://docs.python.org/3/library/index.html). Usually used with Nginx.
+viola is a WSGI server. Lightweight and efficient and has no dependencies other than the Python Standard Library. Usually used with Nginx.
 
 Table of content:
 
@@ -14,7 +14,7 @@ Table of content:
 - [Example](https://github.com/prprprus/viola#example)
 - [Performance](https://github.com/prprprus/viola#performance)
 - [TODO](https://github.com/prprprus/viola#todo)
-- [Resources](https://github.com/prprprus/viola#resources)
+- [Reference](https://github.com/prprprus/viola#reference)
 - [License](https://github.com/prprprus/viola#license)
 - [Contributing](https://github.com/prprprus/viola#contributing)
 
@@ -265,7 +265,7 @@ Percentage of the requests served within a certain time (ms)
 + [ ] Event driven for more platforms
 + [ ] Improved coverage
 
-### Resources
+### Reference
 
 - [EPOLL(7)](http://man7.org/linux/man-pages/man7/epoll.7.html)
 - [How To Use Linux epoll with Python](http://scotdoyle.com/python-epoll-howto.html)
