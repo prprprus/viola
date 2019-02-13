@@ -81,6 +81,9 @@ That's all.
 + [ ] Millisecond timer
 + [ ] HTTP POST method and more
 + [ ] Improved response module
++ [ ] Improved response module
++ [ ] Event driven for more platforms
++ [ ] Improved coverage
 
 ### Resources
 
