@@ -36,7 +36,7 @@ viola 是一个 WSGI 服务器. 轻量级、高效并且没有 Python 标准库�
 
 安装包已经上传到了 [PyPI](https://pypi.org/project/viola/)
 
-你可以使用 pip 进行安装
+你可以使用 pip 进行安装:
 
 ```
 $ pip install viola
@@ -44,7 +44,7 @@ $ pip install viola
 
 ## 例子
 
-这样使用 viola:
+使用 viola:
 
 ```python
 from viola.core.event_loop import EventLoop
@@ -196,7 +196,7 @@ Percentage of the requests served within a certain time (ms)
  100%  15091 (longest request)
 ```
 
-#### Nginx + viola(viola 以但进程形式启动) + bottle
+#### Nginx + viola(viola 以单进程形式启动) + bottle
 
 ```
 $ ab -n 10000 -c 500 http://10.211.55.25/
@@ -260,7 +260,7 @@ Percentage of the requests served within a certain time (ms)
 + [ ] 完善服务端的 WSGI 协议实现
 + [ ] 定时器从秒级升级到毫秒级
 + [ ] 解析 HTTP POST 方法等等
-+ [ ] 完善响应功能模块
++ [ ] 完善响应模块
 + [ ] 支持更多平台的事件驱动模型
 + [ ] 提高测试覆盖率
 
@@ -281,6 +281,6 @@ viola 遵循 MIT 开源协议. 详情参考 [LICENSE](https://github.com/prprpru
 
 ## 参与贡献
 
-非常感谢你对 viola 的关注, 你的关注和贡献是对于我来说非常宝贵的.
+非常感谢你对 viola 的关注, 你的关注和贡献对于我来说是非常宝贵的.
 
-你可以通过提交 issue 和 pull requests 来参与其中, 但是请先提交 issue 再 pull requests.
+你可以通过提交 issue 和 pull requests 来参与其中, 但是请先提交 issue 再 pull requests ^_^.

@@ -36,7 +36,7 @@ Table of content:
 
 Package is uploaded on [PyPI](https://pypi.org/project/viola/)
 
-You can install with pip
+You can install with pip:
 
 ```
 $ pip install viola
@@ -283,4 +283,4 @@ viola is released under the MIT License. See [LICENSE](https://github.com/prprpr
 
 Thank you for your interest in contribution of viola, your help and contribution is very valuable. 
 
-You can submit issue and pull requests, please submit an issue before submitting pull requests.
+You can submit issue and pull requests, please submit an issue before submitting pull requests ^_^.
