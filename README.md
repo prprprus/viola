@@ -194,7 +194,7 @@ Percentage of the requests served within a certain time (ms)
  100%  15091 (longest request)
 ```
 
-#### Nginx + viola + bottle
+#### Nginx + viola(viola start one process) + bottle
 
 ```
 $ ab -n 10000 -c 500 http://10.211.55.25/
