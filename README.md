@@ -96,7 +96,7 @@ That's all.
 
 ## License
 
-viola is released under the MIT License. See LICENSE for more information.
+viola is released under the MIT License. See [LICENSE](https://github.com/prprprus/viola/blob/master/LICENSE) for more information.
 
 ## Contributing
 
