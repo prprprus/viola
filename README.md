@@ -32,7 +32,7 @@ Table of content:
 
 ## Installation
 
-Package is uploaded on [PyPI](https://pypi.org/project/pymysql-pooling/)
+Package is uploaded on [PyPI](https://pypi.org/project/viola/)
 
 You can install with pip
 
