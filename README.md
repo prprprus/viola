@@ -265,7 +265,14 @@ Percentage of the requests served within a certain time (ms)
 
 ### Resources
 
-- xxx
+- [EPOLL(7)](http://man7.org/linux/man-pages/man7/epoll.7.html)
+- [How To Use Linux epoll with Python](http://scotdoyle.com/python-epoll-howto.html)
+- [Python Standard Library](https://docs.python.org/3/library/index.html)
+- [An overview of HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
+- [RFC 2616 -- HTTP GET method](https://tools.ietf.org/html/rfc2616#section-9.3)
+- [PEP 333](https://www.python.org/dev/peps/pep-0333/#environ-variables)
+- [Tornado](https://www.tornadoweb.org/en/stable/#)
+- [Gunicorn](http://docs.gunicorn.org/en/latest/index.html)
 
 ## License
 
