@@ -70,7 +70,7 @@ That's all.
 ```
 ```
 
-### Nginx + Gunicorn + bottle
+#### Nginx + Gunicorn + bottle
 
 ```
 ```
