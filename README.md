@@ -69,7 +69,7 @@ The following nginx are load balanced with one WSGI server. Nginx configuration 
 
 ```
 CPU: 2.7 GHz Intel Core i5
-MEM:  GB 1867 MHz DDR3
+MEM: 8 GB 1867 MHz DDR3
 ```
 
 ```
