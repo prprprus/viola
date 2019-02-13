@@ -44,7 +44,7 @@ $ pip install viola
 
 ## Example
 
-Run viola as follows:
+Use viola as follows:
 
 ```python
 from viola.core.event_loop import EventLoop
@@ -67,7 +67,7 @@ That's all.
 
 ## Performance
 
-The following nginx are load balanced with one WSGI server. Nginx configuration is consistent and the WSGI server response a string "Hello World".
+The following nginx are proxy with one WSGI server. Nginx configuration is consistent and the WSGI server response a string "Hello World".
 
 ```
 CPU: 2.7 GHz Intel Core i5
@@ -78,7 +78,7 @@ MEM: 8 GB 1867 MHz DDR3
 ab -n 10000 -c 500 http://10.211.55.25/
 ```
 
-#### Nginx + Tornado(Tornado as both a WSGI server and Web framework. Tornado start one process.)
+#### Nginx + Tornado(Tornado as both a WSGI server and Web framework. Tornado start one process)
 
 ```
 $ ab -n 10000 -c 500 http://10.211.55.25/
@@ -257,15 +257,14 @@ Percentage of the requests served within a certain time (ms)
 
 ## TODO
 
-+ [ ] Improved WSGI protocol
++ [ ] Improved WSGI protocol of server side
 + [ ] Millisecond timer
 + [ ] HTTP POST method and more
-+ [ ] Improved response module
 + [ ] Improved response module
 + [ ] Event driven for more platforms
 + [ ] Improved coverage
 
-### Reference
+## Reference
 
 - [EPOLL(7)](http://man7.org/linux/man-pages/man7/epoll.7.html)
 - [How To Use Linux epoll with Python](http://scotdoyle.com/python-epoll-howto.html)
