@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="viola",
-    version="0.3.6",
+    version="0.3.7",
     author="prprprus",
     author_email="huangzongzhuan@gmail.com",
     description="viola is a lightweight and efficient WSGI server.",
