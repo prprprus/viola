@@ -16,6 +16,7 @@ class TCPStream(object):
         self.write_buffer = collections.deque()
         self.chunk_size = chunk_size
         self.max_buffer_size = max_buffer_size
+        self.processed_buffer = collections.deque()
 
         self.event_loop.add_handler(self.c_socket.fileno(), EventLoop.READ,
                                     self.handle_event)

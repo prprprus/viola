@@ -1,10 +1,9 @@
 import io
+import sys
 from viola.exception import (
     ViolaHTTPMethodException,
     ViolaHTTPVersionException
 )
-import sys
-import collections
 
 
 class Parser(object):
@@ -21,8 +20,9 @@ class Parser(object):
         "HTTP/1.1",
         "HTTP/1.0"]
 
-    def __init__(self, read_buffer):
-        self.read_buffer = read_buffer
+    def __init__(self, raw_buffer, processed_buffer):
+        self.raw_buffer = raw_buffer
+        self.processed_buffer = processed_buffer
         self.headers = {}
         self.res = {}
 
@@ -36,7 +36,7 @@ class Parser(object):
         }
 
     def _parse_headers(self):
-        req_cont = io.StringIO(self.read_buffer[0])
+        req_cont = io.StringIO(self.processed_buffer[0])
         for line in req_cont.readlines():
             line = line.strip('\n').strip('\r')
             if line:
@@ -83,16 +83,13 @@ class Parser(object):
         """
         # Parse GET method
         delimiter = "\r\n\r\n"
-        wrough_rebuff = collections.deque()
-        if self.read_buffer:
-            str_rebuff = ""
-            for rb in self.read_buffer:
-                str_rebuff += rb.decode("utf8")
-            [wrough_rebuff.append(x) for x in str_rebuff.split(delimiter)
-             if x.replace(" ", "")]
-        self.read_buffer = wrough_rebuff
+        if self.raw_buffer:
+            stream = ""
+            for rb in self.raw_buffer:
+                stream += rb.decode("utf8")
+            [self.processed_buffer.append(x) for x in stream.split(delimiter) if x.replace(" ", "")]
         res = self.parse_request()  # Parse HTTP request
-        self.read_buffer.popleft()  # Consume
+        self.processed_buffer.popleft()  # Consume
 
         # Parse POST method: TODO
         pass
