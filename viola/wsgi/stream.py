@@ -17,12 +17,6 @@ class WSGIStream(TCPStream):
         if event & EventLoop.READ:
             self.handle_read()
             if self.read_buffer:
-
-                # 是否已经读取了完整的请求? 是则往下执行
-                pass
-
-                # 为什么这里只消费了一个 HTTP 请求, 最终却能把所有的请求都处理完?
-                # 因为 LT. 只有将所有请求都处理了(也就是将读就绪事件都改成写感兴趣), LT 才不会通知, 不然它会一直通知.
                 # Parse request
                 p = Parser(self.read_buffer, self.processed_buffer)
                 env = p.get_environ()
