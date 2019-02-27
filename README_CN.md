@@ -4,7 +4,7 @@
 
 [英文](https://github.com/prprprus/viola/blob/master/README.md)
 
-viola 是一个 WSGI 服务器. 轻量级、高效并且没有 Python 标准库之外的其他依赖. 通常以 Nginx 为反向代理搭配使用. 我用它搭建了[博客](http://hentaiuih.us/), 静态资源交给 Nginx 处理, 动态内容由 viola 处理. 你也可以用它来搭建博客和站点, 或者用它作为学习网络编程的一个参考.
+viola 是一个 WSGI 服务器. 轻量级、高效并且没有 Python 标准库之外的其他依赖. 通常以 Nginx 为反向代理搭配使用. 我用它搭建了[博客](http://hentaiuih.us/), 静态资源交给 Nginx 处理, 动态内容由 viola 处理. 你也可以用它来搭建博客和站点.
 
 目录:
 
